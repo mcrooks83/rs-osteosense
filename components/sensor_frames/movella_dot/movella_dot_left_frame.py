@@ -21,11 +21,7 @@ class MovellaDotLeftFrame(CTkFrame):
         self.grid(row=0, column=0, sticky="nsew", )
         #self.grid_columnconfigure((0), weight=1)
         #self.grid_rowconfigure((0), weight=1)
-        
-        #self.grid_columnconfigure(0, weight=1)
-
-        self.logo_label = CTkLabel(self, text="Movella Dot Left Frame", font=CTkFont(size=15, weight="bold"))
-        self.logo_label.grid(row=0, column=0, padx=5, pady=(20, 20), sticky="nwse" )
+    
 
         
 

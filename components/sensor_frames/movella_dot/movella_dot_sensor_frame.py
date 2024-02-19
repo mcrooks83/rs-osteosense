@@ -61,6 +61,7 @@ class MovellaDotSensorFrame(CTkFrame):
 
         # are added when connected and removed when disconnected
         self.connected_sensors = []
+        self.connected_sensor_actions = []
     
     def scan_for_sensors(self):
         print(f"scan for sensors button pressed") 
@@ -75,32 +76,50 @@ class MovellaDotSensorFrame(CTkFrame):
         self.sm.manager.send_message("connect", address)
         self.console.clear_console()
         self.console.insert_text(f"connecting to dot {address} ...") 
+
     
     def connected_sensor(self, sensor):
         print(f"UI connected to {sensor}")
-        #grid_info = get_label_row(label1)
+
+        sensor_actions = {
+            "address": sensor.address,
+            "position": self.connect_to_pos,
+            "connect_button" : None,
+            "disconnect_button": None,
+            "identify_button" : None,
+            "batt_label" : None,
+            "data_rate_label": None
+        }
+
+      
         self.console.clear_console()
         self.console.insert_text("Connected to Dot: " + sensor.address + " " +'\n')
 
-        self.connected_sensors.append(s.Sensor(sensor.address))
+        #self.connected_sensors.append(s.Sensor(sensor.address))
 
         #place the identify button over the connect button
-        self.connected_sensor_identity_button = CTkButton(self.left_frame, text="identify", fg_color="#5D5FEF", command= lambda: self.identify_sensor(sensor.address))
-        self.connected_sensor_identity_button.grid(row=self.connect_to_pos+2, column=1, padx=10, pady=10, sticky="nw")
-        self.connected_sensor_identity_button.identifier = "indentify_btn"
+        #self.connected_sensor_identity_button = CTkButton(self.left_frame, text="identify", fg_color="#5D5FEF", command= lambda: self.identify_sensor(sensor.address))
+        connected_sensor_identity_button = CTkButton(self.left_frame, text="identify", fg_color="#5D5FEF", command= lambda: self.identify_sensor(sensor.address))
+        connected_sensor_identity_button.grid(row=self.connect_to_pos+2, column=1, padx=10, pady=10, sticky="nw")
+        connected_sensor_identity_button.identifier = "indentify_btn"
+        sensor_actions["identify_button"] = connected_sensor_identity_button
 
-        self.connected_sensor_batt_label = CTkLabel(self.left_frame, text=f"{sensor.batt_level}%", font=CTkFont(size=12, weight="bold"))
-        self.connected_sensor_batt_label.grid(row=self.connect_to_pos+2, column=2, padx=10, pady=10, sticky="nw")
-        self.connected_sensor_batt_label.identifier = "batt_status"
+        connected_sensor_batt_label = CTkLabel(self.left_frame, text=f"{sensor.batt_level}%", font=CTkFont(size=12, weight="bold"))
+        connected_sensor_batt_label.grid(row=self.connect_to_pos+2, column=2, padx=10, pady=10, sticky="nw")
+        connected_sensor_batt_label.identifier = "batt_status"
+        sensor_actions['batt_label'] = connected_sensor_batt_label
 
-        self.disconnect_sensor_btn = CTkButton(self.left_frame, text="disconnect", command= lambda: self.disconnect_from_sensor(sensor.address))
-        self.disconnect_sensor_btn.grid(row=self.connect_to_pos+2, column=3, padx=10, pady=10, sticky="nw")
-        self.disconnect_sensor_btn.identifier = "disconnect_btn"
+        disconnect_sensor_btn = CTkButton(self.left_frame, text="disconnect", command= lambda: self.disconnect_from_sensor(sensor.address))
+        disconnect_sensor_btn.grid(row=self.connect_to_pos+2, column=3, padx=10, pady=10, sticky="nw")
+        disconnect_sensor_btn.identifier = "disconnect_btn"
+        sensor_actions['disconnect_button'] = disconnect_sensor_btn
 
-        self.connected_sensor_data_rate_label = CTkLabel(self.left_frame, text=f"60 Hz", font=CTkFont(size=12, weight="bold"))
-        self.connected_sensor_data_rate_label.grid(row=self.connect_to_pos+2, column=4, padx=10, pady=10, sticky="nw")
-        self.connected_sensor_batt_label.identifier = "data_rate"
+        connected_sensor_data_rate_label = CTkLabel(self.left_frame, text=f"60 Hz", font=CTkFont(size=12, weight="bold"))
+        connected_sensor_data_rate_label.grid(row=self.connect_to_pos+2, column=4, padx=10, pady=10, sticky="nw")
+        connected_sensor_data_rate_label.identifier = "data_rate"
+        sensor_actions["data_rate_label"] = connected_sensor_data_rate_label
 
+        self.connected_sensor_actions.append(sensor_actions)
     
     # no need for this function
     def on_sensor_data(self, data_packet):
@@ -139,14 +158,16 @@ class MovellaDotSensorFrame(CTkFrame):
             x = s.get_time_pc(num_of_points)
             accel_x = s.get_accel_x(num_of_points)
             #axis.text(0.005, 1.05 + (idx / 10), f"Data Rate: {s.get_last_data_rate()} Hz ", transform=axis.transAxes)
-            self.connected_sensor_data_rate_label.configure(text=f"{s.get_last_data_rate()} Hz")
+
+            sensor_actions = [sa for sa in self.connected_sensor_actions if sa["address"] == s.get_address()][0]
+            sensor_actions["data_rate_label"].configure(text=f"{s.get_last_data_rate()} Hz")
             axis.plot(x, accel_x)
         
         canvas.draw()
 
     def stop_measuring_for_sensors(self):
         print(f"stop measuring on all sensors")
-        #self.after_cancel(self.update_stream_plot_task_id)
+        self.after_cancel(self.update_stream_plot_task_id)
         for s in self.sm.manager.get_connected_sensors():
             print(s.get_packet_count(), s.get_last_data_rate())
 
@@ -167,10 +188,18 @@ class MovellaDotSensorFrame(CTkFrame):
 
     def battery_status_callback(self, address, battery):
         print(f"ui batt status {address} {battery}%")
+
+        if (len(self.connected_sensor_actions) == len(self.sm.manager.get_connected_sensors())):
+           sensor_actions = [sa for sa in self.connected_sensor_actions if sa["address"] == address][0]
+           sensor_actions['batt_label'].configure(text=f"{battery}%")
+        #print(sensor_actions)
+        #self.
         # to really use this we need to be able to track the rows / connected sensors to update the correct one
-        #self.connected_sensor_batt_label.configure(text=f"{battery}%")
-        #if(battery <= 10):
-        #    self.console_frame.insert_text(f"sensor {address} battery 10% or less" + '\n\n') 
+        #if hasattr(self, 'connected_sensor_batt_label'):
+        #    sensor_actions['batt_label'].configure(text=f"{battery}%")
+            #if(battery <= 10):
+            #    self.connected_sensor_batt_label.configure(text=f"{battery}%", text_color="red")
+            #    self.console.insert_text(f"sensor {address} battery 10% or less" + '\n\n') 
         #    self.console_frame.insert_text(f"sensor {address} will not send data" + '\n\n') 
 
     
@@ -186,6 +215,7 @@ class MovellaDotSensorFrame(CTkFrame):
         pos = self.connected_sensor_positions[address]
         # position + 2 gets the row
         for widget in self.left_frame.grid_slaves(row=pos+2):
+            print(widget)
 
             #w_name = self.nametowidget(widget)
            
@@ -214,12 +244,16 @@ class MovellaDotSensorFrame(CTkFrame):
                      widget.destroy()
 
         print(f"sensor {address} disconnected ")
+
+        
+        sensor_action = [sa for sa in self.connected_sensor_actions if sa["address"] == s.get_address][0]
+        self.connected_sensor_actions.remove(sensor_action)
         self.console.clear_console()
         self.console.insert_text(f"sensor {address} disconnected")
 
     def disconnect_from_sensor(self, address):
-        found_sensor = [sensor for sensor in self.connected_sensors if sensor.address == address][0]
-        self.connected_sensors.remove(found_sensor)
+        #found_sensor = [sensor for sensor in self.sm.mangage.get_connected_sensors if sensor.address == address][0]
+        #self.sm.connected_sensors.remove(found_sensor)
         self.sm.manager.send_message("disconnect", address)
         self.console.clear_console()
         self.console.insert_text(f"disconnecting sensor {address} ...")
@@ -227,7 +261,6 @@ class MovellaDotSensorFrame(CTkFrame):
     def discovered_senors(self, sensors):
         labels = []
         connect_buttons = []
-        battery_labels = []
 
         def connect_lambda(address, position):
             return lambda: self.connect_to_sensor(address, position)

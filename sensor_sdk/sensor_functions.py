@@ -71,6 +71,10 @@ async def start_measuring_on_all_sensors(sensor_manager):
     start_char = sensor_type.config["ble_config"]["characteristics"]["start_measurement"]
     measurement_service = sensor_type.config['ble_config']["services"]["measurement_service"]
 
+    # clear all data if starting a test again
+    for s in sensor_manager.connected_sensors:
+        s.clear_all_data()
+
     # this doesnt matter as > 1 sensor halves data rate
     tasks = [s.ble_client.write_gatt_char(measurement_service, start_char,  response=True) for s in sensor_manager.connected_sensors]
     await asyncio.gather(*tasks)
@@ -82,8 +86,10 @@ async def stop_measuring_on_all_sensors(sensor_manager):
     sensor_type = [st for st in sts if st.get_sensor_type_name() == sensor_manager.get_selected_sensor()][0]
     stop_char = sensor_type.config["ble_config"]["characteristics"]["stop_measurement"]
     measurement_service = sensor_type.config['ble_config']["services"]["measurement_service"]
-    for s in sensor_manager.connected_sensors:
-         await s.ble_client.write_gatt_char(measurement_service, stop_char, response=True)
+    #for s in sensor_manager.connected_sensors:
+    #     await s.ble_client.write_gatt_char(measurement_service, stop_char, response=True)
+    tasks = [s.ble_client.write_gatt_char(measurement_service, stop_char,  response=True) for s in sensor_manager.connected_sensors]
+    await asyncio.gather(*tasks)
 
 async def stop_measuring(sensor_manager, address):
     sensor = list(filter(lambda x: x.address == address, sensor_manager.connected_sensors))[0]

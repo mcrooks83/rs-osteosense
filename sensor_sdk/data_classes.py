@@ -66,10 +66,23 @@ class ConnectedSensor:
         self.batt_level = battery_level.battery_level
         self.sensor_manager.on_battery_status(self.address, battery_level.battery_level)
     
+
+    def clear_all_data(self):
+        self.raw_data = []
+        self.packet_count = -1
+        self.time_pc = []
+        self.accel_x = []
+
+    def get_address(self):
+        return self.address
+    
     def update_data_rate(self, rate):
         # compute the data rate from timestamps
         self.data_rate = rate
 
+    def get_batt_level(self):
+        return self.batt_level
+    
     def get_last_data_rate(self):
         return self.data_rate
     
