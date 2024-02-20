@@ -30,6 +30,7 @@ class ConnectedSensor:
         self.address = address
         self.ble_device = ble_device
         self.ble_client = client
+        self.placement = ""
         self.sensor_manager = sensor_manager
         self.batt_level = 0
         self.raw_data = []
@@ -41,6 +42,12 @@ class ConnectedSensor:
         #vars
         self.prev_timestamp = 0
         self.latest_timestamp = 0
+
+    def on_button_event(self,sender, event):
+        press_type = event[0] # should be 5 for single press
+        if(press_type == 5):
+            print(f"single button press from {self.address}")
+            self.sensor_manager.on_sensor_button_press(self.address, press_type)
 
     def on_sensor_data(self, sender, data):
         
@@ -75,6 +82,12 @@ class ConnectedSensor:
 
     def get_address(self):
         return self.address
+    
+    def get_placement(self):
+        return self.placement
+    
+    def set_placement(self, placement):
+        self.placement = placement
     
     def update_data_rate(self, rate):
         # compute the data rate from timestamps

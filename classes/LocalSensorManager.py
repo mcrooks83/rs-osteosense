@@ -18,6 +18,7 @@ class LocalSensorManager:
         self.manager.on_battery_status = self.on_battery_status
         self.manager.on_sensor_data = self.on_sensor_data
         self.manager.on_message_error = self.on_message_error
+        self.manager.on_sensor_button_press = self.on_sensor_button_press
         
         # callback references 
         self.discovered_sensors = None
@@ -27,6 +28,7 @@ class LocalSensorManager:
         self.stop_sensor_data = None
         self.battery_status = None
         self.export_done_callback = None
+        self.sensor_button_press_callback = None
        
     # callback references from UI components that need the data
    
@@ -51,6 +53,9 @@ class LocalSensorManager:
     def set_export_done_callback(self, func):
         self.export_done_callback = func
 
+    def set_sensor_button_press_callback(self, func):
+        self.sensor_button_press_callback = func
+
     # sensor manager callbacks
     def on_sdk_init(self, done: bool):
         print(f"sdk init: {done}")
@@ -70,6 +75,9 @@ class LocalSensorManager:
     def on_sensor_disconnected(self, address: str):
         print(f"sensor {address} disconnected")
         self.sensor_disconnected(address)
+
+    def on_sensor_button_press(self, address: str, press_type:int):
+        self.sensor_button_press_callback(address, press_type)
     
     def on_sensor_data(self, data_packet: dc.SensorDataPacket):
         self.sensor_data(data_packet)

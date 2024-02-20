@@ -64,6 +64,8 @@ def get_battery_level(batt_bytes):
 #   Acceleration 12 bytes (4 per value)
 #   Angular velocity 12 bytes (4 per value)
 
+     
+
 def encode_data_packet(bytes_):
 
     data_segments = np.dtype([

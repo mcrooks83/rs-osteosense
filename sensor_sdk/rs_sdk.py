@@ -18,6 +18,10 @@ class RSSensorSDK(ABC):
         pass
 
     @abstractmethod
+    def on_sensor_button_press(self, address:str, press_type: int):
+        pass
+
+    @abstractmethod
     def on_sensor_disconnected(self, address: str):
         pass
 

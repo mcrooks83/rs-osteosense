@@ -64,6 +64,9 @@ class SensorManager(SDK):
     def on_sensor_connected(self, sensor: dc.ConnectedSensor):
         return super().on_sensor_connected(sensor)
     
+    def on_sensor_button_press(self, address:str, press_type: int):
+        return super().on_sensor_button_press(address, press_type)
+    
     def on_sensor_disconnected(self, address:str):
         return super().on_sensor_disconnected(address)
     

@@ -1,10 +1,4 @@
-from customtkinter import CTkFrame, CTkTabview, CTkLabel, CTkFont, CTkComboBox, StringVar, CTkButton, CTkLabel
-#from matplotlib.pyplot import Figure
-#from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,NavigationToolbar2Tk)
-#from matplotlib import style
-#from mpl_toolkits.axisartist.axislines import AxesZero
-#style.use('fivethirtyeight')
-#style.use("dark_background")
+from customtkinter import CTkFrame, CTkTabview, CTkLabel, CTkFont, CTkComboBox, StringVar, CTkButton, CTkLabel,CTkInputDialog
 import threading
 import multiprocessing
 import math
@@ -14,6 +8,7 @@ from components.sensor_frames.movella_dot import  movella_dot_left_frame as mdlf
 from components.sensor_frames.movella_dot import  movella_dot_right_frame as mdrf
 
 import classes.Sensor as s
+from components.sensor_frames.movella_dot import assign_sensor_window as asw
 
 class MovellaDotSensorFrame(CTkFrame):
     def __init__(self, master, sensor_manager, console, params,  **kwargs):
@@ -31,6 +26,7 @@ class MovellaDotSensorFrame(CTkFrame):
         self.sm.set_battery_status_callback(self.battery_status_callback)
         self.sm.set_sensor_data_callback(self.on_sensor_data)
         self.sm.set_sensor_disconnected_callback(self.on_sensor_disconnected)
+        self.sm.set_sensor_button_press_callback(self.on_sensor_button_press)
 
         self.grid(row=0, column=0, sticky="nsew")
         self.grid_rowconfigure((2), weight=1)
@@ -62,6 +58,8 @@ class MovellaDotSensorFrame(CTkFrame):
         # are added when connected and removed when disconnected
         self.connected_sensors = []
         self.connected_sensor_actions = []
+
+        self.assign_sensor_window = None
     
     def scan_for_sensors(self):
         print(f"scan for sensors button pressed") 
@@ -69,6 +67,30 @@ class MovellaDotSensorFrame(CTkFrame):
         #self.console.clear_console()
         self.console.insert_text("scanning for sensors ...") 
 
+    def assign_sensor_ref(self, address, assignment):
+        print(f"UI: {address} {assignment}")
+        sensor = self.sm.manager.get_connected_sensor_by_address(address)
+        sensor.set_placement(assignment)
+        sensor_actions = [sa for sa in self.connected_sensor_actions if sa["address"] == address][0]
+
+        if(sensor_actions["placement_label"] != None):
+            sensor_actions["placement_label"].destroy()
+
+        placement_label = CTkLabel(self.left_frame, text=f"{assignment}")
+        placement_label.grid(row=sensor_actions["position"]+2, column=6, sticky="nesw")
+        placement_label.identifier = "placement_label"
+        sensor_actions["placement_label"] = placement_label
+
+    def on_sensor_button_press(self, address, press_type):
+        if(press_type == 5):
+            print(f"button press from {address}")
+            if self.assign_sensor_window is None or not self.assign_sensor_window.winfo_exists():
+                print("show top level window")
+                self.assign_sensor_window = asw.AssignSensorWindow(self, address, self.assign_sensor_ref, self.params)  # create window if its None or destroyed
+            else:
+                self.assign_sensor_window.focus()  # if window exists focus it
+            
+   
     def connect_to_sensor(self, address, position):
         print(f"conecting to sensor {address} in position {position}")
         self.connect_to_pos = position
@@ -88,7 +110,8 @@ class MovellaDotSensorFrame(CTkFrame):
             "disconnect_button": None,
             "identify_button" : None,
             "batt_label" : None,
-            "data_rate_label": None
+            "data_rate_label": None,
+            "placement_label": None,
         }
 
       
@@ -213,11 +236,11 @@ class MovellaDotSensorFrame(CTkFrame):
         
         # need to remove all the buttons associated with connected and return to just connect
         pos = self.connected_sensor_positions[address]
+
+        #sensor_actions = [sa for sa in self.connected_sensor_actions if sa["address"] == address][0]
+        
         # position + 2 gets the row
         for widget in self.left_frame.grid_slaves(row=pos+2):
-            print(widget)
-
-            #w_name = self.nametowidget(widget)
            
             if(hasattr(widget, "identifier")): 
                 if(widget.identifier == "indentify_btn"):
@@ -236,17 +259,19 @@ class MovellaDotSensorFrame(CTkFrame):
                     except TclError as e:
                         print(f"Error while destroying the button: {e}")
                     
-                    
                 elif(widget.identifier == "batt_status"):
                      widget.destroy()
 
                 elif(widget.identifier == "data_rate"):
                      widget.destroy()
+                
+                elif(widget.identifier == "placement_label"):
+                     widget.destroy()
 
         print(f"sensor {address} disconnected ")
 
         
-        sensor_action = [sa for sa in self.connected_sensor_actions if sa["address"] == s.get_address][0]
+        sensor_action = [sa for sa in self.connected_sensor_actions if sa["address"] == address][0]
         self.connected_sensor_actions.remove(sensor_action)
         self.console.clear_console()
         self.console.insert_text(f"sensor {address} disconnected")

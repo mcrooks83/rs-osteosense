@@ -63,6 +63,7 @@ sensor_types = {
                 "battery_service" : "15173001-4947-11e9-8646-d663bd873d93",
                 "control_service"  : "15171002-4947-11e9-8646-d663bd873d93",
                 "measurement_service"  : "15172001-4947-11e9-8646-d663bd873d93",
+                "device_report": "15171004-4947-11e9-8646-d663bd873d93"
             },
             "characteristics": {
                 "identify": b'\x01\x01\x02\n\x00\x1e\x00\tXsens DOT\x00\x00\x00\x00\x00\x00\x00<\x00\x00\x00\x00\x00\x00\x00',
@@ -71,7 +72,8 @@ sensor_types = {
                 "data_rates": {
                     "20": b'\x04\x00\x02\n\x00\x1e\x00\tXsens DOT\x00\x00\x00\x00\x00\x00\x00\x14\x00\x00\x00\x00\x00\x00',
                     "60": b'\x04\x00\x02\n\x00\x1e\x00\tXsens DOT\x00\x00\x00\x00\x00\x00\x00\x3C\x00\x00\x00\x00\x00\x00'
-                }
+                },
+                
             },
             "payloads":[
                 {

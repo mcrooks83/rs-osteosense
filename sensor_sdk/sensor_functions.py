@@ -42,6 +42,11 @@ async def connect_to_sensor(sensor_manager, address):
     #payload = sensor_type.config["ble_config"]["payloads"][sensor_type.payload_name]
     await device.start_notify(payload["payload_size"], connected_sensor.on_sensor_data )
 
+    #subsribe to button press
+    device_report = sensor_type.config["ble_config"]["services"]["device_report"]
+
+    await device.start_notify(device_report, connected_sensor.on_button_event)
+
     #read initial battery
     battery_service = sensor_type.config["ble_config"]["services"]["battery_service"]
     batt = await device.read_gatt_char(battery_service, response=True)
