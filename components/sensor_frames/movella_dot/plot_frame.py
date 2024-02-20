@@ -11,9 +11,9 @@ class PlotFrame(CTkFrame):
     def __init__(self, master, console, params, **kwargs):
         super().__init__(master,  **kwargs)
 
-        self.grid(row=0, column=0, sticky="nsew")
+        self.grid(row=1, column=0, sticky="nsew")
         self.grid_columnconfigure((0), weight=1)
-        self.grid_rowconfigure((0), weight=1)
+        self.grid_rowconfigure((1), weight=1)
 
         self.console = console
         self.params = params
@@ -25,7 +25,7 @@ class PlotFrame(CTkFrame):
         self.stream_fig.subplots_adjust(bottom=0.15)        
 
         self.stream_fig_canvas = FigureCanvasTkAgg(self.stream_fig, master=self)
-        self.stream_fig_canvas.get_tk_widget().grid(row=0, column=0, sticky='nsew', padx=5, pady=10)
+        self.stream_fig_canvas.get_tk_widget().grid(row=1, column=0, sticky='nsew', padx=5, pady=10)
     
 
  

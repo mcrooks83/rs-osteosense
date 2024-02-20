@@ -21,7 +21,16 @@ class MovellaDotRightFrame(CTkFrame):
 
         self.grid(row=0, column=0, sticky="nsew")
         self.grid_columnconfigure((0), weight=1)
-        self.grid_rowconfigure((0), weight=1)
+        self.grid_rowconfigure((1), weight=1)
+
+        
+
+        self.protocol_label = CTkLabel(self, text="No Protocol Selected", fg_color="#5D5FEF", font=CTkFont(size=12, weight="bold"))
+        self.protocol_label.grid(row=0, column=0, sticky="nesw")
+        #self.protocol_time_remaining_label = CTkLabel(self, text="", fg_color="#5D5FEF",)
+        #self.protocol_label.grid(row=0, column=1, sticky="nesw")
+        #self.protocol_reps_label = CTkLabel(self, text="", fg_color="#5D5FEF",)
+        #self.protocol_reps_label.grid(row=0, column=2, sticky="nesw")
     
 
         self.plot_frame = pf.PlotFrame(self, self.console, self.params)

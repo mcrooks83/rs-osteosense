@@ -13,14 +13,12 @@ from components.sensor_frames.movella_dot import count_down_frame as cdf
 from components.sensor_frames.movella_dot import plot_frame as pf
 
 class MovellaDotSensorFrame(CTkFrame):
-    def __init__(self, master, sensor_manager, console, params,  **kwargs):
+    def __init__(self, master, sensor_manager, console, params,   **kwargs):
         super().__init__(master,  **kwargs)
 
         self.console = console
         self.params = params
         self.sm = sensor_manager
-
-        #self.rate = 60
         self.number_of_plot_points = 250
 
         self.sm.set_discovered_sensors_callback(self.discovered_senors)
@@ -36,20 +34,10 @@ class MovellaDotSensorFrame(CTkFrame):
 
         self.connected_sensor_positions = {}
 
-        self.scan_btn =  CTkButton(self, text="scan", command=self.scan_for_sensors, )
+        self.scan_btn =  CTkButton(self, text="scan", fg_color="#5D5FEF", command=self.scan_for_sensors, )
         self.scan_btn.grid(row=0, column=0, sticky='nw',  padx=5, pady=10 )
-
-        self.button_frame = CTkFrame(self)
-        self.button_frame.grid(row=3, column=0,  sticky='nw', padx=5, pady=10)
-        self.button_frame.grid_rowconfigure(0, weight=1)
-
-        self.start_measuring_btn =  CTkButton(self.button_frame, text="start test", fg_color="#5D5FEF", command=self.start_measuring_for_sensors )
-        self.start_measuring_btn.grid(row=0, column=1, sticky='nw',  padx=5, pady=10 )
-
-        self.stop_measuring_btn =  CTkButton(self.button_frame, text="stop test", fg_color="#5D5FEF", command=self.stop_measuring_for_sensors )
-        self.stop_measuring_btn.grid(row=0, column=2, sticky='nw',  padx=5, pady=10 )
         
-        self.left_frame = mdlf.MovellaDotLeftFrame(self, console, params)
+        self.left_frame = mdlf.MovellaDotLeftFrame(self, console, params, self.start_measuring_for_sensors, self.stop_measuring_for_sensors, self.set_protocol )
         self.left_frame.grid(row=2, column=0, padx=5, pady=10, sticky="nsew" )
         self.left_frame.grid_propagate(False)
 
@@ -62,7 +50,27 @@ class MovellaDotSensorFrame(CTkFrame):
         self.connected_sensor_actions = []
 
         self.assign_sensor_window = None
+
+        self.protocol = None
+        self.is_manual = True
     
+    def set_protocol(self, protocol):
+        print(f"setting protocol to {protocol['name']}")
+       
+        self.protocol = protocol
+        self.p_reps = protocol["repetitions"]
+        self.reps = 1 # first rep
+        self.reps_complete = 0
+        reps_to_go = self.p_reps - self.reps_complete
+        #self.left_frame.protcol_frame.status_label.configure(text=f'reps complete: {self.reps_complete}, reps to go: {reps_to_go} ')
+        if(protocol["time_per_rep"]== 0):
+            self.is_manual = True
+        else:
+            self.is_manual = False
+
+        print("is manual", self.is_manual)
+        self.right_frame.protocol_label.configure(text=protocol["name"])
+
     def scan_for_sensors(self):
         print(f"scan for sensors button pressed") 
         self.sm.manager.send_message("scan", {})
@@ -74,6 +82,17 @@ class MovellaDotSensorFrame(CTkFrame):
             print(f"count down complete, load plot frame")
             self.right_frame.plot_frame.lift()
 
+            # start the protocol timer if time_per_rep
+            if(self.protocol["time_per_rep"]!=0):
+                self.start_protcol_timer()
+            else:
+                print("manual stop for protcol")
+                text = self.right_frame.protocol_label.cget('text')
+                p_name = self.protocol["name"]
+                text = f"{p_name} rep {self.reps}"
+                self.right_frame.protocol_label.configure(text=text)
+            
+
     def assign_sensor_ref(self, address, assignment):
         print(f"UI: {address} {assignment}")
         sensor = self.sm.manager.get_connected_sensor_by_address(address)
@@ -83,7 +102,7 @@ class MovellaDotSensorFrame(CTkFrame):
         if(sensor_actions["placement_label"] != None):
             sensor_actions["placement_label"].destroy()
 
-        placement_label = CTkLabel(self.left_frame, text=f"{assignment}")
+        placement_label = CTkLabel(self.left_frame.sensor_frame, text=f"{assignment}")
         placement_label.grid(row=sensor_actions["position"]+2, column=6, sticky="nesw")
         placement_label.identifier = "placement_label"
         sensor_actions["placement_label"] = placement_label
@@ -125,26 +144,24 @@ class MovellaDotSensorFrame(CTkFrame):
         self.console.clear_console()
         self.console.insert_text("Connected to Dot: " + sensor.address + " " +'\n')
 
-        #self.connected_sensors.append(s.Sensor(sensor.address))
-
         #place the identify button over the connect button
         #self.connected_sensor_identity_button = CTkButton(self.left_frame, text="identify", fg_color="#5D5FEF", command= lambda: self.identify_sensor(sensor.address))
-        connected_sensor_identity_button = CTkButton(self.left_frame, text="identify", fg_color="#5D5FEF", command= lambda: self.identify_sensor(sensor.address))
+        connected_sensor_identity_button = CTkButton(self.left_frame.sensor_frame, text="identify", fg_color="#5D5FEF", command= lambda: self.identify_sensor(sensor.address))
         connected_sensor_identity_button.grid(row=self.connect_to_pos+2, column=1, padx=10, pady=10, sticky="nw")
         connected_sensor_identity_button.identifier = "indentify_btn"
         sensor_actions["identify_button"] = connected_sensor_identity_button
 
-        connected_sensor_batt_label = CTkLabel(self.left_frame, text=f"{sensor.batt_level}%", font=CTkFont(size=12, weight="bold"))
+        connected_sensor_batt_label = CTkLabel(self.left_frame.sensor_frame, text=f"{sensor.batt_level}%", font=CTkFont(size=12, weight="bold"))
         connected_sensor_batt_label.grid(row=self.connect_to_pos+2, column=2, padx=10, pady=10, sticky="nw")
         connected_sensor_batt_label.identifier = "batt_status"
         sensor_actions['batt_label'] = connected_sensor_batt_label
 
-        disconnect_sensor_btn = CTkButton(self.left_frame, text="disconnect", command= lambda: self.disconnect_from_sensor(sensor.address))
+        disconnect_sensor_btn = CTkButton(self.left_frame.sensor_frame, text="disconnect", command= lambda: self.disconnect_from_sensor(sensor.address))
         disconnect_sensor_btn.grid(row=self.connect_to_pos+2, column=3, padx=10, pady=10, sticky="nw")
         disconnect_sensor_btn.identifier = "disconnect_btn"
         sensor_actions['disconnect_button'] = disconnect_sensor_btn
 
-        connected_sensor_data_rate_label = CTkLabel(self.left_frame, text=f"60 Hz", font=CTkFont(size=12, weight="bold"))
+        connected_sensor_data_rate_label = CTkLabel(self.left_frame.sensor_frame, text=f"60 Hz", font=CTkFont(size=12, weight="bold"))
         connected_sensor_data_rate_label.grid(row=self.connect_to_pos+2, column=4, padx=10, pady=10, sticky="nw")
         connected_sensor_data_rate_label.identifier = "data_rate"
         sensor_actions["data_rate_label"] = connected_sensor_data_rate_label
@@ -196,6 +213,28 @@ class MovellaDotSensorFrame(CTkFrame):
         canvas.draw()
 
     def stop_measuring_for_sensors(self):
+
+        if(self.is_manual): # start and stop on our own
+            print("should be here")
+
+            self.reps_complete += 1
+            self.reps += 1
+            
+       
+            if(self.reps_complete == self.protocol["repetitions"]):
+                p_name = self.protocol["name"]
+                text = f"{p_name} complete"
+                self.right_frame.protocol_label.configure(text=text)
+                reps_to_go = self.p_reps - self.reps_complete
+                self.left_frame.protcol_frame.update_status(f'reps complete: {self.reps_complete}, reps to go: {reps_to_go} ')
+                
+            else:
+                
+                reps_to_go = self.p_reps - self.reps_complete
+                self.left_frame.protcol_frame.update_status(f'reps complete: {self.reps_complete}, reps to go: {reps_to_go} ')
+                #self.left_frame.protcol_frame.complete_protocol()
+                
+
         print(f"stop measuring on all sensors")
         self.after_cancel(self.update_stream_plot_task_id)
         for s in self.sm.manager.get_connected_sensors():
@@ -205,24 +244,69 @@ class MovellaDotSensorFrame(CTkFrame):
         self.console.clear_console()
         self.console.insert_text(f"stopping test...") 
 
-    def start_measuring_for_sensors(self):
-        
-        # re create the countdown frame
-        #self.assign_sensor_window is None
-        #self.right_frame.count_down_frame.lower()
-        # initiate countdown
-        self.right_frame.raise_frame(self.right_frame.count_down_frame)
-        self.right_frame.count_down_frame.start_countdown()
-    
-        self.right_frame.plot_frame.ax.clear()
-        self.update_stream_plot()
-       
-        print(f"start measuring on all sensors")
-        
+    def start_protcol_timer(self):
+        self.time_remaining = self.protocol["time_per_rep"]  # Reset the countdown time
+        self.update_protocol_timer()
 
-        self.sm.manager.send_message("start_measuring_all", {})
-        self.console.clear_console()
-        self.console.insert_text(f"starting test...") 
+    def update_protocol_timer(self):
+        protocol_name = self.protocol["name"]
+        if self.time_remaining > 0:
+            text = self.right_frame.protocol_label.cget('text')
+            text = f"{protocol_name} time remaining {self.time_remaining} for rep {self.reps}"
+            self.right_frame.protocol_label.configure(text=text)
+            self.time_remaining -= 1
+            self.protocol_countdown = self.after(1000, self.update_protocol_timer)
+        else:
+            #self.time_remaining -= 1
+            text = f"{protocol_name} time remaining {self.time_remaining} for rep {self.reps}"
+            self.right_frame.protocol_label.configure(text=text)
+
+            self.stop_measuring_for_sensors()
+            
+            self.reps += 1
+            self.reps_complete += 1
+            print("reps complete", self.reps_complete)
+            # initiate next rep (prob should sleep for a bit)
+            if(self.reps_complete != self.protocol["repetitions"]):
+                reps_to_go = self.p_reps - self.reps_complete
+                self.left_frame.protcol_frame.update_status(f'reps complete: {self.reps_complete}, reps to go: {reps_to_go} ')
+                self.start_measuring_for_sensors()
+            else:
+                text = f"{protocol_name} complete"
+                self.right_frame.protocol_label.configure(text=text)
+                
+                reps_to_go = self.p_reps - self.reps_complete
+                self.left_frame.protcol_frame.update_status(f'reps complete: {self.reps_complete}, reps to go: {reps_to_go} ')
+                self.reps = self.protocol["repetitions"]
+
+                #self.left_frame.protcol_frame.complete_protocol()
+
+            
+
+
+    def start_measuring_for_sensors(self):
+
+        #make sure there are connected sensors and there is a protcol
+        if(self.sm.manager.get_number_of_connected_sensors()>0 and self.protocol is not None):
+
+            self.sm.manager.send_message("start_measuring_all", {})
+            self.console.clear_console()
+            self.console.insert_text(f"starting test...") 
+            # initiate countdown
+            self.right_frame.raise_frame(self.right_frame.count_down_frame)
+            self.right_frame.count_down_frame.start_countdown()
+
+            #protocol_label
+            self.right_frame.protocol_label.configure(text=f"get ready for rep {self.reps}")
+        
+            self.right_frame.plot_frame.ax.clear()
+            self.update_stream_plot()
+        
+            print(f"start measuring on all sensors")
+        else:
+            print(f"no connected sensors")
+
+        
 
     def battery_status_callback(self, address, battery):
         print(f"ui batt status {address} {battery}%")
@@ -255,7 +339,7 @@ class MovellaDotSensorFrame(CTkFrame):
         #sensor_actions = [sa for sa in self.connected_sensor_actions if sa["address"] == address][0]
         
         # position + 2 gets the row
-        for widget in self.left_frame.grid_slaves(row=pos+2):
+        for widget in self.left_frame.sensor_frame.grid_slaves(row=pos+2):
            
             if(hasattr(widget, "identifier")): 
                 if(widget.identifier == "indentify_btn"):
@@ -311,9 +395,9 @@ class MovellaDotSensorFrame(CTkFrame):
             
             for idx, s in enumerate(sensors):
                 self.console.insert_text("Sensor found: " + s.address + " " +'\n')
-                label = CTkLabel(self.left_frame, text=f"{s.address}")
+                label = CTkLabel(self.left_frame.sensor_frame, text=f"{s.address}")
                 labels.append(label)
-                connect_button = CTkButton(self.left_frame, text="connect", fg_color="#EF5DA8", command=connect_lambda(s.address, idx))
+                connect_button = CTkButton(self.left_frame.sensor_frame, text="connect", fg_color="#EF5DA8", command=connect_lambda(s.address, idx))
                 connect_buttons.append(connect_button) 
 
             for i in range(len(labels)):

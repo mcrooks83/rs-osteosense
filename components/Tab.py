@@ -1,4 +1,4 @@
-from customtkinter import CTkTabview, CTkLabel, CTkFont, CTkComboBox, StringVar, CTkButton, CTkLabel
+from customtkinter import CTkTabview, CTkLabel, CTkFont, CTkComboBox, StringVar, CTkButton, CTkLabel,CTkFrame
 
 from components.sensor_frames.movella_dot import movella_dot_sensor_frame as mdsf
 from components.sensor_frames.osteosense import  osteosense_sensor_frame as ossf
@@ -9,7 +9,7 @@ import inspect
 class Tab(CTkTabview):
     def __init__(self, master, console, sensor_manager, params,  *args, **kwargs):
         super().__init__(master, *args, **kwargs)
-        self.configure(anchor="w")
+        self.configure(anchor="w", segmented_button_fg_color="#EF5DA8", segmented_button_selected_color='#EF5DA8') 
 
         self.console = console
         self.params = params
@@ -31,14 +31,17 @@ class Tab(CTkTabview):
         self.tab1.grid_rowconfigure(2,weight=1)  # Column weight
         
         # sensor select
-        self.select_sensor_label = CTkLabel(self.tab1, text="Select Sensor", font=CTkFont(size=12, weight="bold"))
+        self.tab1.title_frame = CTkFrame(self.tab1, fg_color="transparent")
+        self.tab1.title_frame.grid(row=0, column=0, sticky='nesw', )
+
+        self.select_sensor_label = CTkLabel(self.tab1.title_frame, text="Select Sensor", font=CTkFont(size=14, weight="bold"),  text_color="#EF5DA8")
         self.select_sensor_label.grid(row=0, column=0,rowspan=1, padx=10, sticky='nw')
         
         #self.params.set_selected_sensor  = StringVar(value=self.supported_sensors[1])
         self.sm.manager.set_selected_sensor(self.supported_sensors[1])
-        self.sensor_select = CTkComboBox(self.tab1, values=self.supported_sensors,
+        self.sensor_select = CTkComboBox(self.tab1.title_frame, values=self.supported_sensors,
                                      command=self.load_sensor_frame,) #variable=selected_sensor_var)
-        self.sensor_select.grid(row=1, column=0,sticky='nw',padx=10,)
+        self.sensor_select.grid(row=0, column=1,sticky='nw',padx=10,)
         #self.sensor_select.bind("<<ComboboxSelected>>", self.load_sensor_frame)
 
         self.tab1.sensor_frame = None

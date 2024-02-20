@@ -36,12 +36,13 @@ class MainApplication(customtkinter.CTk):
         # configure grid layout (4x4)
         #self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
-        self.grid_rowconfigure((1, 2, 3), weight=1)
+        self.grid_rowconfigure((1 ), weight=1)
 
         self.console = Console(self)
         self.title_label = Title(self, text="OsteoSense Test Suite")     
         self.side_bar = SideBar(self, self.console, self.sensor_manager, params)
         self.tab_view = Tab(self, self.console, self.sensor_manager, params)
+       
        
        
 

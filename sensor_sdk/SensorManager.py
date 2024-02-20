@@ -84,6 +84,9 @@ class SensorManager(SDK):
 
     def get_connected_sensors(self):
         return self.connected_sensors
+    
+    def get_number_of_connected_sensors(self):
+        return len(self.connected_sensors)
 
     def set_sensor_types(self, sensor_types):
         self.sensor_types = sensor_types

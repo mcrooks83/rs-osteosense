@@ -13,12 +13,12 @@ class CountDownFrame(CTkFrame):
         self.count_down_end = 0
         self.count_down_start = params.get_count_down_start()
 
-        self.grid(row=0, column=0, sticky="nsew", )
+        self.grid(row=1, column=0, sticky="nsew", )
         self.grid_columnconfigure((0), weight=1)
-        self.grid_rowconfigure((0), weight=1)
+        self.grid_rowconfigure((1), weight=1)
 
         self.count_down_label = CTkLabel(self, text=f"{self.count_down_start}", font=CTkFont(size=100, weight="bold"), text_color="#EF5DA8")
-        self.count_down_label.grid(row=0, column=0, sticky="nsew")
+        self.count_down_label.grid(row=1, column=0, sticky="nsew")
     
 
     def start_countdown(self):

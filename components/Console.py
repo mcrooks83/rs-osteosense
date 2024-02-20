@@ -10,8 +10,7 @@ class Console(CTkTextbox):
         super().__init__(master, *args, **kwargs)
 
         #self.console = CTkTextbox(self, state='normal', width=500)
-        self.grid(row=4, column=1, columnspan=3, padx=(20, 20), pady=(10, 10), sticky="ews")
-        #self.console = CTkTextbox(self, )
+        self.grid(row=4, column=1, columnspan=3, padx=(20, 20), pady=(5, 5), sticky="ews")
         self.insert("0.0", "-| OsteoSense Logs |- \n\n" )
    
     def insert_text(self, text):
