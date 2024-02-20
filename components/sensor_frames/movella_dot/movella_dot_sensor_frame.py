@@ -9,6 +9,8 @@ from components.sensor_frames.movella_dot import  movella_dot_right_frame as mdr
 
 import classes.Sensor as s
 from components.sensor_frames.movella_dot import assign_sensor_window as asw
+from components.sensor_frames.movella_dot import count_down_frame as cdf
+from components.sensor_frames.movella_dot import plot_frame as pf
 
 class MovellaDotSensorFrame(CTkFrame):
     def __init__(self, master, sensor_manager, console, params,  **kwargs):
@@ -51,7 +53,7 @@ class MovellaDotSensorFrame(CTkFrame):
         self.left_frame.grid(row=2, column=0, padx=5, pady=10, sticky="nsew" )
         self.left_frame.grid_propagate(False)
 
-        self.right_frame = mdrf.MovellaDotRightFrame(self, console, params)
+        self.right_frame = mdrf.MovellaDotRightFrame(self, console, params, self.count_down_complete_ref)
         self.right_frame.grid(row=2, column=1, padx=5, pady=10, sticky="nsew" )
         self.right_frame.grid_propagate(False)
 
@@ -66,6 +68,11 @@ class MovellaDotSensorFrame(CTkFrame):
         self.sm.manager.send_message("scan", {})
         #self.console.clear_console()
         self.console.insert_text("scanning for sensors ...") 
+
+    def count_down_complete_ref(self, complete):
+        if(complete):
+            print(f"count down complete, load plot frame")
+            self.right_frame.plot_frame.lift()
 
     def assign_sensor_ref(self, address, assignment):
         print(f"UI: {address} {assignment}")
@@ -153,7 +160,7 @@ class MovellaDotSensorFrame(CTkFrame):
 
     def update_stream_plot(self):
 
-        thread = threading.Thread(target=self.clear_and_plot( self.right_frame.ax, self.right_frame.stream_fig_canvas, f"Acceleration",  self.sm.manager.get_connected_sensors()))
+        thread = threading.Thread(target=self.clear_and_plot( self.right_frame.plot_frame.ax, self.right_frame.plot_frame.stream_fig_canvas, f"Acceleration",  self.sm.manager.get_connected_sensors()))
         thread.start()
         thread.join()
         #self.ax, self.stream_fig_canvas, f"Acceleration {self.c.data_rate} Hz", "packet count", x, acc_x, acc_y, acc_z )
@@ -199,11 +206,19 @@ class MovellaDotSensorFrame(CTkFrame):
         self.console.insert_text(f"stopping test...") 
 
     def start_measuring_for_sensors(self):
+        
+        # re create the countdown frame
+        #self.assign_sensor_window is None
+        #self.right_frame.count_down_frame.lower()
+        # initiate countdown
+        self.right_frame.raise_frame(self.right_frame.count_down_frame)
+        self.right_frame.count_down_frame.start_countdown()
     
-        self.right_frame.ax.clear()
+        self.right_frame.plot_frame.ax.clear()
         self.update_stream_plot()
        
         print(f"start measuring on all sensors")
+        
 
         self.sm.manager.send_message("start_measuring_all", {})
         self.console.clear_console()

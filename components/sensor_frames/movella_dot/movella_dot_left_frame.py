@@ -1,19 +1,9 @@
 from customtkinter import CTkFrame, CTkTabview, CTkLabel, CTkFont, CTkComboBox, StringVar, CTkButton, CTkLabel
-#from matplotlib.pyplot import Figure
-#from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,NavigationToolbar2Tk)
-#from matplotlib import style
-#from mpl_toolkits.axisartist.axislines import AxesZero
-#style.use('fivethirtyeight')
-#style.use("dark_background")
-#import threading
-#import math
+
 
 class MovellaDotLeftFrame(CTkFrame):
     def __init__(self, master, console, params,  **kwargs):
         super().__init__(master,  **kwargs)
-
-        self.console = console
-        self.params = params
 
         self.console = console
         self.params = params

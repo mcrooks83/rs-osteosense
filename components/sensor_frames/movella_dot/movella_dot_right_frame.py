@@ -8,8 +8,12 @@ style.use("dark_background")
 #import threading
 #import math
 
+from components.sensor_frames.movella_dot import count_down_frame as cdf
+from components.sensor_frames.movella_dot import plot_frame as pf
+
+
 class MovellaDotRightFrame(CTkFrame):
-    def __init__(self, master, console, params,  **kwargs):
+    def __init__(self, master, console, params, count_down_complete_ref,  **kwargs):
         super().__init__(master,  **kwargs)
 
         self.console = console
@@ -20,15 +24,14 @@ class MovellaDotRightFrame(CTkFrame):
         self.grid_rowconfigure((0), weight=1)
     
 
-        self.stream_fig = Figure()
-        self.ax = self.stream_fig.subplots()
-        self.ax.set_title(f"Acceleration")
-        self.ax.set_xlabel("packet count")
-        self.stream_fig.subplots_adjust(bottom=0.15)        
-
-        self.stream_fig_canvas = FigureCanvasTkAgg(self.stream_fig, master=self)
-        self.stream_fig_canvas.get_tk_widget().grid(row=0, column=0, sticky='nsew', padx=5, pady=10)
+        self.plot_frame = pf.PlotFrame(self, self.console, self.params)
+        self.count_down_frame = cdf.CountDownFrame(self, self.console, self.params, count_down_complete_ref)
         
-
+        
+    def raise_frame(self, frame):
+        frame.lift()
+    
+    def lower_frame(self, frame):
+        frame.lower()
 
         
