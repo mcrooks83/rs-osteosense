@@ -20,8 +20,8 @@ class PlotFrame(CTkFrame):
 
         self.stream_fig = Figure()
         self.ax = self.stream_fig.subplots()
-        self.ax.set_title(f"Acceleration")
-        self.ax.set_xlabel("packet count")
+        self.ax.set_title(f"Loading")
+        self.ax.set_xlabel("5s Blocks")
         self.stream_fig.subplots_adjust(bottom=0.15)        
 
         self.stream_fig_canvas = FigureCanvasTkAgg(self.stream_fig, master=self)

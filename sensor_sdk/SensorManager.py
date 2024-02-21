@@ -23,6 +23,9 @@ class SensorManager(SDK):
         self.running = False
         self.export_dir = "export"
 
+        # need a way of loading algorithms into the manager
+        # for now each connected sensor will process the data for weight bearing (LI)
+
         # Create a thread to run the SensorManager
         thread = threading.Thread(target=self.run_manager_loop)
         thread.start()
@@ -147,7 +150,7 @@ class SensorManager(SDK):
         connected_sensors = list(filter(lambda x: x.address != address, self.connected_sensors))
         self.connected_sensors = connected_sensors 
 
-
+    # load algortihm?
     
     # sdk event loop
     async def manager_loop(self):
@@ -155,6 +158,9 @@ class SensorManager(SDK):
         self.on_sdk_init(True)
         while self.running:
             msg = await self.message_queue.get()
+
+            # load algorithm?
+
             #Scanning for sensors
             if msg["message"] == "scan":
                 scanned_sensors = await sf.discover_sensors(self)  

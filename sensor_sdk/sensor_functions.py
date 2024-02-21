@@ -12,15 +12,16 @@ async def discover_sensors(sensor_manager):
     #get the sensor type calls 
     sts = sensor_manager.get_sensor_types()
     sensor_type = [st for st in sts if st.get_sensor_type_name() == sensor_manager.get_selected_sensor()][0]
-    print(sensor_type)
     sensors = await hf.discover_sensors()
     scanned_sensors = []
+
     if(sensors):
         for s, a in sensors.values():
             if( len(list(a.manufacturer_data.keys())) != 0 and list(a.manufacturer_data.keys())[0] == sensor_type.manufacturer_id):
                 mac_address = hf.get_mac_address(a.manufacturer_data[sensor_type.manufacturer_id].hex())
                 scanned_sensor = dc.ScannedSensor(mac_address, s.address, s)
                 scanned_sensors.append(scanned_sensor)
+
     return scanned_sensors
 
 async def connect_to_sensor(sensor_manager, address):
@@ -35,16 +36,19 @@ async def connect_to_sensor(sensor_manager, address):
     sensor_manager.connected_sensors.append(connected_sensor)
     payload = {}
     for p in sensor_type.config["ble_config"]["payloads"]:
-        print(p)
         if(p["name"] == sensor_type.payload_name):
             payload = p
 
-    #payload = sensor_type.config["ble_config"]["payloads"][sensor_type.payload_name]
+    # configure sensor with 60Hz data rate to be sure it is set
+    #device_control = sensor_type.config["ble_config"]["services"]["control_service"]
+    #date_rate_char = sensor_manager.sensor_type.config["ble_config"]["characteristics"]["data_rate"]["60"]
+    #await device.ble_client.write_gatt_char(device_control, date_rate_char, response=True)
+    connected_sensor.set_set_data_rate(60)
+
     await device.start_notify(payload["payload_size"], connected_sensor.on_sensor_data )
 
     #subsribe to button press
     device_report = sensor_type.config["ble_config"]["services"]["device_report"]
-
     await device.start_notify(device_report, connected_sensor.on_button_event)
 
     #read initial battery
@@ -78,7 +82,9 @@ async def start_measuring_on_all_sensors(sensor_manager):
 
     # clear all data if starting a test again
     for s in sensor_manager.connected_sensors:
+        print("Setting is measuring")
         s.clear_all_data()
+        s.set_is_measuring(True)
 
     # this doesnt matter as > 1 sensor halves data rate
     tasks = [s.ble_client.write_gatt_char(measurement_service, start_char,  response=True) for s in sensor_manager.connected_sensors]
@@ -91,8 +97,10 @@ async def stop_measuring_on_all_sensors(sensor_manager):
     sensor_type = [st for st in sts if st.get_sensor_type_name() == sensor_manager.get_selected_sensor()][0]
     stop_char = sensor_type.config["ble_config"]["characteristics"]["stop_measurement"]
     measurement_service = sensor_type.config['ble_config']["services"]["measurement_service"]
-    #for s in sensor_manager.connected_sensors:
+    for s in sensor_manager.connected_sensors:
+        s.set_is_measuring(False)
     #     await s.ble_client.write_gatt_char(measurement_service, stop_char, response=True)
+        
     tasks = [s.ble_client.write_gatt_char(measurement_service, stop_char,  response=True) for s in sensor_manager.connected_sensors]
     await asyncio.gather(*tasks)
 

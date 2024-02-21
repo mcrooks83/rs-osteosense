@@ -168,14 +168,15 @@ class MovellaDotSensorFrame(CTkFrame):
     
     # no need for this function
     def on_sensor_data(self, data_packet):
+        pass
         #print(data_packet.address, data_packet.data_packet)
-        sensor = self.sm.manager.get_connected_sensor_by_address(data_packet.address)
+        #sensor = self.sm.manager.get_connected_sensor_by_address(data_packet.address)
         #print(found_sensor)
         #found_sensor.set_accleration([data_packet.data_packet[0][0], data_packet.data_packet[0][5], data_packet.data_packet[0][6], data_packet.data_packet[0][7] ])
 
     def update_stream_plot(self):
 
-        thread = threading.Thread(target=self.clear_and_plot( self.right_frame.plot_frame.ax, self.right_frame.plot_frame.stream_fig_canvas, f"Acceleration",  self.sm.manager.get_connected_sensors()))
+        thread = threading.Thread(target=self.clear_and_plot( self.right_frame.plot_frame.ax, self.right_frame.plot_frame.stream_fig_canvas, f"Loading",  self.sm.manager.get_connected_sensors()))
         thread.start()
         thread.join()
         #self.ax, self.stream_fig_canvas, f"Acceleration {self.c.data_rate} Hz", "packet count", x, acc_x, acc_y, acc_z )
@@ -194,53 +195,53 @@ class MovellaDotSensorFrame(CTkFrame):
        
         axis.clear()
         axis.set_title(title)
-        axis.set_xlabel("packet count")
+        axis.set_xlabel("5s Blocks")
        # axis.text(0.005, 1.05, f"Data Rate: {self.rate} Hz ", transform=axis.transAxes)
         num_of_points = self.number_of_plot_points
+        num_of_points = 50
         
         for idx, s in enumerate(sensors_to_plot):
         #    print(s.get_packet_count())
-            x = s.get_time_pc(num_of_points)
-            accel_x = s.get_accel_x(num_of_points)
+            #x = s.get_time_pc(num_of_points)
+            x = s.get_time_idx_in_window(num_of_points)
+            #accel_x = s.get_accel_x(num_of_points)
+            li = s.get_li(num_of_points)
+
+            axis.bar(x , li, width=0.8, color="#5D5FEF")
+
             #axis.text(0.005, 1.05 + (idx / 10), f"Data Rate: {s.get_last_data_rate()} Hz ", transform=axis.transAxes)
 
             sensor_actions = [sa for sa in self.connected_sensor_actions if sa["address"] == s.get_address()][0]
             sensor_actions["data_rate_label"].configure(text=f"{s.get_last_data_rate()} Hz")
-            axis.plot(x, accel_x)
-        
+        axis.autoscale_view()
         canvas.draw()
 
     def stop_measuring_for_sensors(self):
+        print(f"stop measuring on all sensors")
+        self.sm.manager.send_message("stop_measuring_all", {})
+        self.console.clear_console()
+        self.console.insert_text(f"stopping test...") 
+
+        self.after_cancel(self.update_stream_plot_task_id)
+
+        for s in self.sm.manager.get_connected_sensors():
+            print(s.get_packet_count(), s.get_length_raw_data(), s.get_last_data_rate())
 
         if(self.is_manual): # start and stop on our own
-            print("should be here")
-
             self.reps_complete += 1
             self.reps += 1
-            
-       
             if(self.reps_complete == self.protocol["repetitions"]):
                 p_name = self.protocol["name"]
                 text = f"{p_name} complete"
                 self.right_frame.protocol_label.configure(text=text)
                 reps_to_go = self.p_reps - self.reps_complete
-                self.left_frame.protcol_frame.update_status(f'reps complete: {self.reps_complete}, reps to go: {reps_to_go} ')
+                self.left_frame.protcol_frame.update_status(f'reps complete: {self.reps_complete}   reps to go: {reps_to_go} ')
                 
             else:
-                
                 reps_to_go = self.p_reps - self.reps_complete
-                self.left_frame.protcol_frame.update_status(f'reps complete: {self.reps_complete}, reps to go: {reps_to_go} ')
+                self.left_frame.protcol_frame.update_status(f'reps complete: {self.reps_complete}   reps to go: {reps_to_go} ')
                 #self.left_frame.protcol_frame.complete_protocol()
                 
-
-        print(f"stop measuring on all sensors")
-        self.after_cancel(self.update_stream_plot_task_id)
-        for s in self.sm.manager.get_connected_sensors():
-            print(s.get_packet_count(), s.get_last_data_rate())
-
-        self.sm.manager.send_message("stop_measuring_all", {})
-        self.console.clear_console()
-        self.console.insert_text(f"stopping test...") 
 
     def start_protcol_timer(self):
         self.time_remaining = self.protocol["time_per_rep"]  # Reset the countdown time
@@ -267,20 +268,19 @@ class MovellaDotSensorFrame(CTkFrame):
             # initiate next rep (prob should sleep for a bit)
             if(self.reps_complete != self.protocol["repetitions"]):
                 reps_to_go = self.p_reps - self.reps_complete
-                self.left_frame.protcol_frame.update_status(f'reps complete: {self.reps_complete}, reps to go: {reps_to_go} ')
+                self.left_frame.protcol_frame.update_status(f'reps complete: {self.reps_complete}   reps to go: {reps_to_go} ')
                 self.start_measuring_for_sensors()
             else:
                 text = f"{protocol_name} complete"
                 self.right_frame.protocol_label.configure(text=text)
                 
                 reps_to_go = self.p_reps - self.reps_complete
-                self.left_frame.protcol_frame.update_status(f'reps complete: {self.reps_complete}, reps to go: {reps_to_go} ')
+                self.left_frame.protcol_frame.update_status(f'reps complete: {self.reps_complete}   reps to go: {reps_to_go} ')
                 self.reps = self.protocol["repetitions"]
 
                 #self.left_frame.protcol_frame.complete_protocol()
 
-            
-
+        
 
     def start_measuring_for_sensors(self):
 

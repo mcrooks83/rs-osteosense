@@ -81,7 +81,7 @@ class ProtocolFrame(CTkFrame):
         self.reset_protocl_btn.grid(row=0, column=2, sticky='nwse',  padx=5, pady=5 )
 
       
-        self.status_label = CTkLabel(self.start_stop_frame, text=f"reps complete: 0, reps to go: {reps}", text_color="#FFFFFF")
+        self.status_label = CTkLabel(self.start_stop_frame, text=f"reps complete: 0     reps to go: {reps}", text_color="#FFFFFF")
         self.status_label.grid(row=1, column=0, padx=5,  pady=5, sticky="nesw")
        
         self.set_protocol_ref(self.selected_protocol)

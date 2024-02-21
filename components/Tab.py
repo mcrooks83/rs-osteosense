@@ -9,7 +9,7 @@ import inspect
 class Tab(CTkTabview):
     def __init__(self, master, console, sensor_manager, params,  *args, **kwargs):
         super().__init__(master, *args, **kwargs)
-        self.configure(anchor="w", segmented_button_fg_color="#EF5DA8", segmented_button_selected_color='#EF5DA8') 
+        self.configure(anchor="w", segmented_button_fg_color="#EF5DA8") 
 
         self.console = console
         self.params = params
@@ -21,11 +21,13 @@ class Tab(CTkTabview):
         
         self.grid(row=1, column=1, rowspan=3, padx=(20, 20), pady=(20, 20), sticky="nsew")
         
-       
-        self.add("Sensors")
-        self.add("Data Capture")
+        self.add("People")
+        self.add("Tests")
+        self.add("Results")
+        self.set("Tests")  # set currently visible tab
         
-        self.tab1 = self.tab("Sensors")
+        
+        self.tab1 = self.tab("Tests")
         self.tab1.grid_columnconfigure((0,1), weight=1)  # Column weight
         #self.tab1.grid_rowconfigure(1, weight=1)
         self.tab1.grid_rowconfigure(2,weight=1)  # Column weight
