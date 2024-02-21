@@ -6,7 +6,6 @@ from CTkMessagebox import CTkMessagebox
 from components.sensor_frames.movella_dot import  movella_dot_left_frame as mdlf
 from components.sensor_frames.movella_dot import  movella_dot_right_frame as mdrf
 
-import classes.Sensor as s
 from components.sensor_frames.movella_dot import assign_sensor_window as asw
 from components.sensor_frames.movella_dot import count_down_frame as cdf
 from components.sensor_frames.movella_dot import plot_frame as pf
