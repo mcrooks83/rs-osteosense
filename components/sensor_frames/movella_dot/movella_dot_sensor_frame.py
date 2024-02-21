@@ -1,8 +1,7 @@
 from customtkinter import CTkFrame, CTkTabview, CTkLabel, CTkFont, CTkComboBox, StringVar, CTkButton, CTkLabel,CTkInputDialog
 import threading
-import multiprocessing
-import math
 from tkinter import TclError
+from CTkMessagebox import CTkMessagebox
 
 from components.sensor_frames.movella_dot import  movella_dot_left_frame as mdlf
 from components.sensor_frames.movella_dot import  movella_dot_right_frame as mdrf
@@ -305,6 +304,9 @@ class MovellaDotSensorFrame(CTkFrame):
             print(f"start measuring on all sensors")
         else:
             print(f"no connected sensors")
+            if(self.sm.manager.get_number_of_connected_sensors()==0):
+                CTkMessagebox(title="Error", message="No sensors connected", icon="cancel")
+            
 
         
 
