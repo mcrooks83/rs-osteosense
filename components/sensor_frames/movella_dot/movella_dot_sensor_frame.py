@@ -209,8 +209,6 @@ class MovellaDotSensorFrame(CTkFrame):
 
             axis.bar(x , li, width=0.8, color="#5D5FEF")
 
-            #axis.text(0.005, 1.05 + (idx / 10), f"Data Rate: {s.get_last_data_rate()} Hz ", transform=axis.transAxes)
-
             sensor_actions = [sa for sa in self.connected_sensor_actions if sa["address"] == s.get_address()][0]
             sensor_actions["data_rate_label"].configure(text=f"{s.get_last_data_rate()} Hz")
         axis.autoscale_view()
@@ -240,8 +238,6 @@ class MovellaDotSensorFrame(CTkFrame):
             else:
                 reps_to_go = self.p_reps - self.reps_complete
                 self.left_frame.protcol_frame.update_status(f'reps complete: {self.reps_complete}   reps to go: {reps_to_go} ')
-                #self.left_frame.protcol_frame.complete_protocol()
-                
 
     def start_protcol_timer(self):
         self.time_remaining = self.protocol["time_per_rep"]  # Reset the countdown time

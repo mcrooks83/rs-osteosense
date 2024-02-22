@@ -2,6 +2,7 @@ from customtkinter import CTkTabview, CTkLabel, CTkFont, CTkComboBox, StringVar,
 
 from components.sensor_frames.movella_dot import movella_dot_sensor_frame as mdsf
 from components.sensor_frames.osteosense import  osteosense_sensor_frame as ossf
+from components.results_tab import results_tab_frame as rtf
 
 import inspect
 
@@ -19,18 +20,26 @@ class Tab(CTkTabview):
         #variables
         self.connect_to_pos = 0
         
-        self.grid(row=1, column=1, rowspan=3, padx=(20, 20), pady=(20, 20), sticky="nsew")
+        self.grid(row=1, column=1,  padx=(20, 20), pady=(20, 20), sticky="nsew")
         
         self.add("People")
         self.add("Tests")
         self.add("Results")
-        self.set("Tests")  # set currently visible tab
+
+        self.set("Results")  # set currently visible tab
         
-        
+        ##### TAB 2
+        self.tab2 = self.tab("Results")
+        self.tab2.grid_columnconfigure((0,1), weight=1)  # Column weight
+        self.tab2.results_tab_frame = rtf.ResultsTabFrame(self.tab2, console, params)
+        self.tab2.results_tab_frame.grid(row=2, column=0, columnspan=2, rowspan=3)  # spans two columns that are "created" by the parent view
+        self.tab2.grid_rowconfigure((2),weight=1)  # Column weight
+
+        ##### TAB 1
         self.tab1 = self.tab("Tests")
         self.tab1.grid_columnconfigure((0,1), weight=1)  # Column weight
         #self.tab1.grid_rowconfigure(1, weight=1)
-        self.tab1.grid_rowconfigure(2,weight=1)  # Column weight
+        self.tab1.grid_rowconfigure(2,weight=1)  # Row weight
         
         # sensor select
         self.tab1.title_frame = CTkFrame(self.tab1, fg_color="transparent")
