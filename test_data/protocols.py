@@ -7,7 +7,7 @@
 protocols =[
 
     {
-        "name":"10M Walk",
+        "name":"Repeated 10M Walk",
         "description": "A walk at self regulated pace for 30 seconds",
         "time_per_rep": 5,
         "repetitions": 2,

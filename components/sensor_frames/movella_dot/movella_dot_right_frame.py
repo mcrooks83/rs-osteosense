@@ -8,12 +8,14 @@ style.use("dark_background")
 #import threading
 #import math
 
-from components.sensor_frames.movella_dot import count_down_frame as cdf
-from components.sensor_frames.movella_dot import plot_frame as pf
+from components.test_tab import count_down_frame as cdf
+from components.test_tab import plot_frame as pf
 
 class MovellaDotRightFrame(CTkFrame):
     def __init__(self, master, console, params, count_down_complete_ref,  **kwargs):
         super().__init__(master,  **kwargs)
+        
+        #self.configure(fg_color="#5D5FEF")
 
         self.console = console
         self.params = params
@@ -22,13 +24,20 @@ class MovellaDotRightFrame(CTkFrame):
         self.grid_columnconfigure((0), weight=1)
         self.grid_rowconfigure((1), weight=1)
 
-        self.protocol_label = CTkLabel(self, text="No Protocol Selected", fg_color="#5D5FEF", font=CTkFont(size=12, weight="bold"))
-        self.protocol_label.grid(row=0, column=0, sticky="nesw")
+        self.label_frame = CTkFrame(self)
+        self.label_frame.grid(row=0, column=0, sticky="nesw")
+        self.label_frame.configure(fg_color="#5D5FEF")
+        self.label_frame.grid_columnconfigure((0), weight=1)
+
+        self.protocol_label = CTkLabel(self.label_frame, text="No Protocol Selected", fg_color="#5D5FEF", font=CTkFont(size=22, weight="bold"))
+        self.protocol_label.grid(row=0, column=0, sticky="nesw", pady=20)
 
         # add this frame into a holding frame
+       
         self.plot_frame = pf.PlotFrame(self, self.console, self.params)
-
         self.count_down_frame = cdf.CountDownFrame(self, self.console, self.params, count_down_complete_ref)
+       
+
         
     def raise_frame(self, frame):
         frame.lift()

@@ -6,9 +6,11 @@ from CTkMessagebox import CTkMessagebox
 from components.sensor_frames.movella_dot import  movella_dot_left_frame as mdlf
 from components.sensor_frames.movella_dot import  movella_dot_right_frame as mdrf
 
-from components.sensor_frames.movella_dot import assign_sensor_window as asw
-from components.sensor_frames.movella_dot import count_down_frame as cdf
-from components.sensor_frames.movella_dot import plot_frame as pf
+from components.test_tab import assign_sensor_window as asw
+from components.test_tab import count_down_frame as cdf
+from components.test_tab import plot_frame as pf
+
+import matplotlib.ticker as MaxNLocator
 
 class MovellaDotSensorFrame(CTkFrame):
     def __init__(self, master, sensor_manager, console, params,   **kwargs):
@@ -196,6 +198,7 @@ class MovellaDotSensorFrame(CTkFrame):
         axis.clear()
         axis.set_title(title)
         axis.set_xlabel("5s Blocks")
+        #axis.xaxis.set_major_locator(MaxNLocator(integer=True))
        # axis.text(0.005, 1.05, f"Data Rate: {self.rate} Hz ", transform=axis.transAxes)
         num_of_points = self.number_of_plot_points
         num_of_points = 50

@@ -1,5 +1,5 @@
 from customtkinter import CTkFrame, CTkTabview, CTkLabel, CTkFont, CTkComboBox, StringVar, CTkButton, CTkLabel
-from components.sensor_frames.movella_dot import protocol_frame as pcolf
+from components.test_tab import protocol_frame as pcolf
 from components.sensor_frames.movella_dot import sensor_frame as sf
 class MovellaDotLeftFrame(CTkFrame):
     def __init__(self, master, console, params, start_measuring_for_sensors, stop_measuring_for_sensors, set_protocol,  **kwargs):

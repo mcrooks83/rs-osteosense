@@ -31,21 +31,18 @@ class MainApplication(customtkinter.CTk):
         self.height = self.winfo_screenheight()
         self.geometry(f"{self.width}x{self.height}")
        
-
-
         # configure grid layout (4x4)
         #self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure((1 ), weight=1)
 
-        self.console = Console(self)
+        
         self.title_label = Title(self, text="OsteoSense Test Suite")     
-        self.side_bar = SideBar(self, self.console, self.sensor_manager, params)
-        self.tab_view = Tab(self, self.console, self.sensor_manager, params)
+        self.side_bar = SideBar(self,  self.sensor_manager, params)
+        self.console = Console(self.side_bar)
+        #self.side_bar.grid_propagate(False)
+        self.tab_view = Tab(self, self.console, self.sensor_manager, params, self.side_bar)
        
-       
-       
-
     def change_appearance_mode_event(self, new_appearance_mode: str):
         customtkinter.set_appearance_mode(new_appearance_mode)
 

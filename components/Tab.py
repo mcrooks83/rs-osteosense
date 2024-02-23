@@ -8,12 +8,13 @@ import inspect
 
 # currently not in use
 class Tab(CTkTabview):
-    def __init__(self, master, console, sensor_manager, params,  *args, **kwargs):
+    def __init__(self, master, console, sensor_manager, params, sidebar,  *args, **kwargs):
         super().__init__(master, *args, **kwargs)
         self.configure(anchor="w", segmented_button_fg_color="#EF5DA8") 
 
         self.console = console
         self.params = params
+        self.side_bar = sidebar
         self.sm = sensor_manager
         self.supported_sensors = sensor_manager.get_supported_sensors()
 
@@ -26,14 +27,15 @@ class Tab(CTkTabview):
         self.add("Tests")
         self.add("Results")
 
-        self.set("Results")  # set currently visible tab
+        self.set("Tests")  # set currently visible tab
         
         ##### TAB 2
         self.tab2 = self.tab("Results")
         self.tab2.grid_columnconfigure((0,1), weight=1)  # Column weight
-        self.tab2.results_tab_frame = rtf.ResultsTabFrame(self.tab2, console, params)
+        self.tab2.results_tab_frame = rtf.ResultsTabFrame(self.tab2, console, params, self.side_bar)
         self.tab2.results_tab_frame.grid(row=2, column=0, columnspan=2, rowspan=3)  # spans two columns that are "created" by the parent view
         self.tab2.grid_rowconfigure((2),weight=1)  # Column weight
+        self.tab2.results_tab_frame.side_bar.set_patient_name("Dr Vico")
 
         ##### TAB 1
         self.tab1 = self.tab("Tests")

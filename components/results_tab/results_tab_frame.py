@@ -2,9 +2,11 @@ from customtkinter import CTkFrame, CTkTabview, CTkLabel, CTkFont, CTkComboBox, 
 from components.results_tab import test_results_frame as trf
 from components.results_tab import last_known_state_frame as lksf
 from components.results_tab import progress_results_frame as prf
+
+
 # holds all the frames for the results tab
 class ResultsTabFrame(CTkFrame):
-    def __init__(self, master, console, params, **kwargs):
+    def __init__(self, master, console, params, side_bar, **kwargs):
         super().__init__(master,  **kwargs)
 
         self.grid(row=0, column=0, rowspan=2, sticky="nsew")
@@ -13,6 +15,9 @@ class ResultsTabFrame(CTkFrame):
 
         self.console = console
         self.params = params
+        self.side_bar = side_bar
+
+        
 
         self.test_results_frame = prf.ProgressResultsFrame(self, console, params)
         self.test_results_frame.grid(row=0,  column=0, columnspan=2, sticky="nsew", padx=5, pady=5,)
