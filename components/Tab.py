@@ -3,6 +3,8 @@ from customtkinter import CTkTabview, CTkLabel, CTkFont, CTkComboBox, StringVar,
 from components.sensor_frames.movella_dot import movella_dot_sensor_frame as mdsf
 from components.sensor_frames.osteosense import  osteosense_sensor_frame as ossf
 from components.results_tab import results_tab_frame as rtf
+from components.people_tab import people_frame as ptvf
+
 
 import inspect
 
@@ -27,9 +29,16 @@ class Tab(CTkTabview):
         self.add("Tests")
         self.add("Results")
 
-        self.set("Tests")  # set currently visible tab
+        self.set_tab_view("People")  # set currently visible tab
+
+        ##### TAB 0
+        self.tab0 = self.tab("People")
+        self.tab0.grid_columnconfigure((0,1), weight=1)  # Column weight
+        self.tab0.people_frame = ptvf.PeopleFrame(self.tab0, console, params, self.side_bar)
+        self.tab0.people_frame.grid(row=1, column=0, columnspan=2, rowspan=3)
+        self.tab0.grid_rowconfigure(1,weight=1)  # Row weight
         
-        ##### TAB 2
+        ##### TAB 1
         self.tab2 = self.tab("Results")
         self.tab2.grid_columnconfigure((0,1), weight=1)  # Column weight
         self.tab2.results_tab_frame = rtf.ResultsTabFrame(self.tab2, console, params, self.side_bar)
@@ -37,7 +46,7 @@ class Tab(CTkTabview):
         self.tab2.grid_rowconfigure((2),weight=1)  # Column weight
         self.tab2.results_tab_frame.side_bar.set_patient_name("Dr Vico")
 
-        ##### TAB 1
+        ##### TAB 2
         self.tab1 = self.tab("Tests")
         self.tab1.grid_columnconfigure((0,1), weight=1)  # Column weight
         #self.tab1.grid_rowconfigure(1, weight=1)
@@ -59,7 +68,8 @@ class Tab(CTkTabview):
 
         self.tab1.sensor_frame = None
 
-
+    def set_tab_view(self, tab_name):
+        self.set(f"{tab_name}")
 
     def load_sensor_frame(self, sensor):
         print(f"{sensor} selected")  

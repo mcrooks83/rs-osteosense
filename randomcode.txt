@@ -1,0 +1,45 @@
+self.frame_1 = CTkFrame(master=self)
+        self.frame_1.grid(row=1, column=0,columnspan=2, sticky="nesw", padx=10, pady=5)
+
+        ###Treeview Customisation (theme colors are selected)
+        bg_color = self._apply_appearance_mode(customtkinter.ThemeManager.theme["CTkFrame"]["fg_color"])
+        text_color = self._apply_appearance_mode(customtkinter.ThemeManager.theme["CTkLabel"]["text_color"])
+        selected_color = self._apply_appearance_mode(customtkinter.ThemeManager.theme["CTkButton"]["fg_color"])
+
+        treestyle = ttk.Style()
+        treestyle.theme_use('default')
+        treestyle.configure("Treeview", background=bg_color, foreground=text_color, fieldbackground=bg_color, borderwidth=0)
+        treestyle.map('Treeview', background=[('selected', bg_color)], foreground=[('selected', selected_color)])
+        self.bind("<<TreeviewSelect>>", lambda event: self.focus_set())
+
+        frame1 = CTkFrame(self, )
+        label1 = CTkLabel(frame1, text="Frame 1 Label")
+        button1 = CTkButton(frame1, text="Frame 1 Button")
+        label1.grid(row=0, column=0)
+        button1.grid(row=1, column=0)
+
+        ##Treeview widget data
+        columns = ('first_name', 'last_name', 'email')
+        
+        contacts = []
+        for n in range(1, 100):
+            contacts.append((f'first {n}', f'last {n}', f'email{n}@example.com'))
+
+      
+
+        self.people_treeview = ttk.Treeview(self.frame_1, height=6, show="tree", columns=columns)
+
+          # add data to the treeview
+        for contact in contacts:
+            self.people_treeview.insert('', "end", values=frame1)
+        #self.people_treeview.heading('first_name', text='First Name')
+        #self.people_treeview.heading('last_name', text='Last Name')
+        #self.people_treeview.heading('email', text='Email')
+        self.people_treeview.grid(row=0, column=0, sticky="nsew", padx=1, pady=1)
+        #self.people_treeview.insert('', '0', 'i1', text ='Knee Recovey ')
+    
+
+
+        
+
+       

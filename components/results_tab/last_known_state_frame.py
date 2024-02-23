@@ -87,11 +87,6 @@ class LastKnownStateFrame(CTkFrame):
         self.missing.grid(row=4, column=1, sticky="nsw", padx=5,  pady=10)
 
 
-        
-        
-
-
-
          # scan frame
         self.scan_title = CTkLabel(self.image_frame, text=f'Latest Scan', 
                                                font=CTkFont(size=22, weight="bold"), text_color="#FFFFFF",)
