@@ -94,11 +94,11 @@ class LastKnownStateFrame(CTkFrame):
 
          # scan frame
         self.scan_title = CTkLabel(self.image_frame, text=f'Latest Scan', 
-                                               font=CTkFont(size=18, weight="bold"), text_color="#FFFFFF",)
+                                               font=CTkFont(size=22, weight="bold"), text_color="#FFFFFF",)
         self.scan_title.grid(row=0, column=0, sticky="nsw", padx=10,)
 
         scan_image_path = os.path.join(os.getcwd(), 'images', "knee-mri" + '.jpeg')
-        self.scan_image = CTkImage(Image.open(scan_image_path), size=(205,205))
+        self.scan_image = CTkImage(Image.open(scan_image_path), size=(215,215))
 
         self.scan_image_label = CTkLabel(self.image_frame, text="", image=self.scan_image, justify="center")
         self.scan_image_label.grid(row=1, column=0, sticky="nswe", pady=10)

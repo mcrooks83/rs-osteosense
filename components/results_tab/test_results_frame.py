@@ -48,7 +48,7 @@ class TestResultsFrame(CTkFrame):
         self.freq_results_frame.grid(row=1, column=1, sticky="nsew", padx=10, pady=10)
         #self.freq_results_frame.grid_propagate(False)
         self.freq_results_frame.grid_columnconfigure((0,1), weight=1)
-        self.freq_results_frame.grid_rowconfigure((0,1,2,3), weight=1)
+        self.freq_results_frame.grid_rowconfigure((1,2,3,4), weight=1)
 
         self.loading_results_title = CTkLabel(self.loading_results_frame, text=f'Results', 
                                                font=CTkFont(size=22, weight="bold"), text_color="#FFFFFF",)
@@ -89,38 +89,40 @@ class TestResultsFrame(CTkFrame):
 
 
   
-
+        self.off_loading_results_title = CTkLabel(self.freq_results_frame, text=f'Off Load', 
+                                               font=CTkFont(size=22, weight="bold"), text_color="#FFFFFF",)
+        self.off_loading_results_title.grid(row=0, column=0, sticky="nsw", padx=5,)
         self.low_freq_left_title = CTkLabel(self.freq_results_frame, text=f'Left Low Frequency', 
                                                font=CTkFont(size=14, weight="bold"), text_color="#FFFFFF",)
-        self.low_freq_left_title.grid(row=0, column=0, sticky="new", padx=5, )
+        self.low_freq_left_title.grid(row=1, column=0, sticky="new", padx=5, )
         self.low_freq_left = CTkLabel(self.freq_results_frame, text=f'49%', 
                                                font=CTkFont(size=22, weight="bold"), text_color="#5D5FEF",)
-        self.low_freq_left.grid(row=1, column=0, sticky="new", padx=5, )
+        self.low_freq_left.grid(row=2, column=0, sticky="new", padx=5, )
 
         self.low_freq_right_title = CTkLabel(self.freq_results_frame, text=f'Right Low Frequency', 
                                                font=CTkFont(size=14, weight="bold"), text_color="#FFFFFF",)
-        self.low_freq_right_title.grid(row=2, column=0, sticky="new", padx=5, )
+        self.low_freq_right_title.grid(row=3, column=0, sticky="new", padx=5, )
 
         self.low_freq_right = CTkLabel(self.freq_results_frame, text=f'51%', 
                                                font=CTkFont(size=22, weight="bold"), text_color="#5D5FEF",)
-        self.low_freq_right.grid(row=3, column=0, sticky="new", padx=5, )
+        self.low_freq_right.grid(row=4, column=0, sticky="new", padx=5, )
 
 
         self.high_freq_left_title = CTkLabel(self.freq_results_frame, text=f'Left High Frequency', 
                                                font=CTkFont(size=14, weight="bold"), text_color="#FFFFFF",)
-        self.high_freq_left_title.grid(row=0, column=1, sticky="new", padx=5, )
+        self.high_freq_left_title.grid(row=1, column=1, sticky="new", padx=5, )
 
         self.high_freq_right = CTkLabel(self.freq_results_frame, text=f'23%', 
                                                font=CTkFont(size=22, weight="bold"), text_color="#5D5FEF",)
-        self.high_freq_right.grid(row=1, column=1, sticky="new", padx=5, )
+        self.high_freq_right.grid(row=2, column=1, sticky="new", padx=5, )
 
         self.high_freq_right_title = CTkLabel(self.freq_results_frame, text=f'Right High Frequency', 
                                                font=CTkFont(size=14, weight="bold"), text_color="#FFFFFF",)
-        self.high_freq_right_title.grid(row=2, column=1, sticky="new", padx=5, )
+        self.high_freq_right_title.grid(row=3, column=1, sticky="new", padx=5, )
 
         self.high_freq_left = CTkLabel(self.freq_results_frame, text=f'77%', 
                                                font=CTkFont(size=22, weight="bold"), text_color="#5D5FEF",)
-        self.high_freq_left.grid(row=3, column=1, sticky="new", padx=5)
+        self.high_freq_left.grid(row=4, column=1, sticky="new", padx=5)
 
 
         
