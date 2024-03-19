@@ -26,7 +26,7 @@ class Tab(CTkTabview):
         
         #self.add("People")
         self.add("Tests")
-        self.add("Results")
+        #self.add("Results")
 
         self.set_tab_view("Tests")  # set currently visible tab
 
@@ -38,16 +38,15 @@ class Tab(CTkTabview):
         #self.tab0.grid_rowconfigure(1,weight=1)  # Row weight
         
         ##### TAB 1
-        self.tab2 = self.tab("Results")
-        self.tab2.grid_columnconfigure((0,1), weight=1)  # Column weight
-        self.tab2.results_tab_frame = rtf.ResultsTabFrame(self.tab2, console, params, self.side_bar)
-        self.tab2.results_tab_frame.grid(row=2, column=0, columnspan=2, rowspan=3)  # spans two columns that are "created" by the parent view
-        self.tab2.grid_rowconfigure((2),weight=1)  # Column weight
+        #self.tab2 = self.tab("Results")
+        #self.tab2.grid_columnconfigure((0,1), weight=1)  # Column weight
+        #self.tab2.results_tab_frame = rtf.ResultsTabFrame(self.tab2, console, params, self.side_bar)
+        #self.tab2.results_tab_frame.grid(row=2, column=0, columnspan=2, rowspan=3)  # spans two columns that are "created" by the parent view
+        #self.tab2.grid_rowconfigure((2),weight=1)  # Column weight
 
         ##### TAB 2
         self.tab1 = self.tab("Tests")
         self.tab1.grid_columnconfigure((0,1), weight=1)  # Column weight
-        #self.tab1.grid_rowconfigure(1, weight=1)
         self.tab1.grid_rowconfigure(2,weight=1)  # Row weight
         
         # sensor select
