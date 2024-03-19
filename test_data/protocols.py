@@ -5,6 +5,14 @@
 #distance = IntField()
 
 protocols =[
+    {
+        "name": "free mode",
+        "description": "free testing",
+        "time_per_rep" : 0,
+        "repetitions": 0,
+        "distance" : 0,
+        "instructions" : "start and stop the test at will.  Useful for experimentation and ad hoc testing"
+    },
 
     {
         "name":"Repeated 10M Walk",

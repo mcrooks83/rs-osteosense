@@ -49,6 +49,7 @@ class ConnectedSensor:
         self.time_idx_for_window = []
         self.set_data_rate = 60
         self.is_measuring = False
+        self.is_first_data_packet = True
 
         #vars
         self.prev_timestamp = 0
@@ -70,23 +71,23 @@ class ConnectedSensor:
             self.sensor_manager.on_sensor_button_press(self.address, press_type)
 
     def on_sensor_data(self, sender, data):
-        
-        encoded_data = hf.encode_data_packet(data)
-        #data_packet = SensorDataPacket(self.address, encoded_data)
-        #self.sensor_manager.on_sensor_data(data_packet)
-        
-        self.latest_timestamp = encoded_data[0][0] 
-        if(self.prev_timestamp != 0):
-            self.update_data_rate(int( 1/((self.latest_timestamp - self.prev_timestamp)/1e6)))
-            self.prev_timestamp = self.latest_timestamp
-        else:
-            self.prev_timestamp = self.latest_timestamp 
 
-        self.add_raw_data_packet(list(encoded_data[0]))
-        self.data_in_window.append(list(encoded_data[0]))
-        #self.accel_x.append(encoded_data[0][5])
-        #self.time_pc.append(self.packet_count)
-        self.packet_count +=1
+        # if its the first packet ignore it
+        if(self.is_first_data_packet):
+            self.is_first_data_packet = False
+        else:
+            encoded_data = hf.encode_data_packet(data)
+        
+            self.latest_timestamp = encoded_data[0][0] 
+            if(self.prev_timestamp != 0):
+                self.update_data_rate(int( 1/((self.latest_timestamp - self.prev_timestamp)/1e6)))
+                self.prev_timestamp = self.latest_timestamp
+            else:
+                self.prev_timestamp = self.latest_timestamp 
+
+            self.add_raw_data_packet(list(encoded_data[0]))
+            self.data_in_window.append(list(encoded_data[0]))
+            self.packet_count +=1
 
         # try to compute loading intensity
         if len(self.data_in_window) == self.data_window:            

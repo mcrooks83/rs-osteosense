@@ -2,6 +2,7 @@ from bleak import BleakClient
 from sensor_sdk import helper_functions as hf
 from sensor_sdk import data_classes as dc
 from datetime import datetime
+import time
 
 import asyncio
 
@@ -29,8 +30,10 @@ async def connect_to_sensor(sensor_manager, address):
     sensor_type = [st for st in sts if st.get_sensor_type_name() == sensor_manager.get_selected_sensor()][0]
     #find device in scanned sensors 
     sensor = list(filter(lambda x: x.address == address, sensor_manager.scanned_sensors))[0]
-    device = BleakClient(sensor.ble_device, loop=sensor_manager.loop)
+    device = BleakClient(sensor.ble_device,loop=sensor_manager.loop)
     await device.connect()
+    print("sleeping for 2 seconds")
+    #time.sleep(2)
 
     connected_sensor = dc.ConnectedSensor(sensor.address, device, sensor.ble_device, sensor_manager)
     sensor_manager.connected_sensors.append(connected_sensor)
@@ -60,9 +63,13 @@ async def connect_to_sensor(sensor_manager, address):
     return connected_sensor
 
 async def disconnect_from_sensor(sensor_manager, address):
-    sensor = list(filter(lambda x: x.address == address, sensor_manager.connected_sensors))[0]
-    disconnected = await sensor.ble_client.disconnect()
-    return disconnected
+    sensor = list(filter(lambda x: x.address == address, sensor_manager.connected_sensors))
+    if(len(sensor)>0):
+        print(f"disconneting from sensor {sensor[0]}")
+        disconnected = await sensor[0].ble_client.disconnect()
+        return disconnected
+    else:
+        return False
 
 
 ### need to reset all the data on a connected sensor

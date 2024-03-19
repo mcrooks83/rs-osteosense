@@ -23,7 +23,6 @@ class PlotFrame(CTkFrame):
         self.ax = self.stream_fig.subplots()
         self.ax.set_title(f"Loading")
         self.ax.set_xlabel("5s Blocks")
-        #self.ax.gca().xaxis.set_major_locator(mticker.MultipleLocator(1))
         self.stream_fig.subplots_adjust(bottom=0.1, left=0.1, right=0.95,top=0.95 )     
 
         self.stream_fig_canvas = FigureCanvasTkAgg(self.stream_fig, master=self)

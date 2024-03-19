@@ -1,2 +1,5 @@
 ttkwidgets
 CTkMessagebox
+bleak 
+pandas
+pyquaternion

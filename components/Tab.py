@@ -22,21 +22,20 @@ class Tab(CTkTabview):
 
         #variables
         self.connect_to_pos = 0
+        self.grid(row=1, column=1,  padx=(10, 10), pady=(10, 10), sticky="nsew")
         
-        self.grid(row=1, column=1,  padx=(20, 20), pady=(20, 20), sticky="nsew")
-        
-        self.add("People")
+        #self.add("People")
         self.add("Tests")
         self.add("Results")
 
-        self.set_tab_view("People")  # set currently visible tab
+        self.set_tab_view("Tests")  # set currently visible tab
 
         ##### TAB 0
-        self.tab0 = self.tab("People")
-        self.tab0.grid_columnconfigure((0,1), weight=1)  # Column weight
-        self.tab0.people_frame = ptvf.PeopleFrame(self.tab0, console, params, self.side_bar)
-        self.tab0.people_frame.grid(row=1, column=0, columnspan=2, rowspan=3)
-        self.tab0.grid_rowconfigure(1,weight=1)  # Row weight
+        #self.tab0 = self.tab("People")
+        #self.tab0.grid_columnconfigure((0,1), weight=1)  # Column weight
+        #self.tab0.people_frame = ptvf.PeopleFrame(self.tab0, console, params, self.side_bar)
+        #self.tab0.people_frame.grid(row=1, column=0, columnspan=2, rowspan=3)
+        #self.tab0.grid_rowconfigure(1,weight=1)  # Row weight
         
         ##### TAB 1
         self.tab2 = self.tab("Results")
@@ -44,7 +43,6 @@ class Tab(CTkTabview):
         self.tab2.results_tab_frame = rtf.ResultsTabFrame(self.tab2, console, params, self.side_bar)
         self.tab2.results_tab_frame.grid(row=2, column=0, columnspan=2, rowspan=3)  # spans two columns that are "created" by the parent view
         self.tab2.grid_rowconfigure((2),weight=1)  # Column weight
-        self.tab2.results_tab_frame.side_bar.set_patient_name("Dr Vico")
 
         ##### TAB 2
         self.tab1 = self.tab("Tests")

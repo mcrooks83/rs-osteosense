@@ -34,15 +34,15 @@ class MovellaDotSensorFrame(CTkFrame):
 
         self.connected_sensor_positions = {}
 
-        self.scan_btn =  CTkButton(self, text="scan", fg_color="#5D5FEF", command=self.scan_for_sensors, )
+        self.scan_btn =  CTkButton(self, text="scan",width=100, fg_color="#5D5FEF", command=self.scan_for_sensors, )
         self.scan_btn.grid(row=0, column=0, sticky='nw',  padx=5, pady=10 )
         
         self.left_frame = mdlf.MovellaDotLeftFrame(self, console, params, self.start_measuring_for_sensors, self.stop_measuring_for_sensors, self.set_protocol )
-        self.left_frame.grid(row=2, column=0, padx=5, pady=10, sticky="nsew" )
+        self.left_frame.grid(row=2, column=0, padx=5, pady=5, sticky="nsew" )
         self.left_frame.grid_propagate(False)
 
         self.right_frame = mdrf.MovellaDotRightFrame(self, console, params, self.count_down_complete_ref)
-        self.right_frame.grid(row=2, column=1, padx=5, pady=10, sticky="nsew" )
+        self.right_frame.grid(row=2, column=1, padx=5, pady=5, sticky="nsew" )
         self.right_frame.grid_propagate(False)
 
         # are added when connected and removed when disconnected
@@ -61,8 +61,6 @@ class MovellaDotSensorFrame(CTkFrame):
         self.p_reps = protocol["repetitions"]
         self.reps = 1 # first rep
         self.reps_complete = 0
-        reps_to_go = self.p_reps - self.reps_complete
-        #self.left_frame.protcol_frame.status_label.configure(text=f'reps complete: {self.reps_complete}, reps to go: {reps_to_go} ')
         if(protocol["time_per_rep"]== 0):
             self.is_manual = True
         else:
@@ -72,6 +70,8 @@ class MovellaDotSensorFrame(CTkFrame):
         self.right_frame.protocol_label.configure(text=protocol["name"])
 
     def scan_for_sensors(self):
+        for w in self.left_frame.sensor_frame.winfo_children():
+            w.destroy()
         print(f"scan for sensors button pressed") 
         self.sm.manager.send_message("scan", {})
         #self.console.clear_console()
@@ -125,7 +125,6 @@ class MovellaDotSensorFrame(CTkFrame):
         self.console.clear_console()
         self.console.insert_text(f"connecting to dot {address} ...") 
 
-    
     def connected_sensor(self, sensor):
         print(f"UI connected to {sensor}")
 
@@ -140,29 +139,31 @@ class MovellaDotSensorFrame(CTkFrame):
             "placement_label": None,
         }
 
-      
         self.console.clear_console()
         self.console.insert_text("Connected to Dot: " + sensor.address + " " +'\n')
 
-        #place the identify button over the connect button
-        #self.connected_sensor_identity_button = CTkButton(self.left_frame, text="identify", fg_color="#5D5FEF", command= lambda: self.identify_sensor(sensor.address))
-        connected_sensor_identity_button = CTkButton(self.left_frame.sensor_frame, text="identify", fg_color="#5D5FEF", command= lambda: self.identify_sensor(sensor.address))
-        connected_sensor_identity_button.grid(row=self.connect_to_pos+2, column=1, padx=10, pady=10, sticky="nw")
+        connected_sensor_identity_button = CTkButton(self.left_frame.sensor_frame, 
+                                                     text="identify", fg_color="#5D5FEF", 
+                                                     width=100,
+                                                     command= lambda: self.identify_sensor(sensor.address))
+        connected_sensor_identity_button.grid(row=self.connect_to_pos+2, column=1, padx=5, pady=10, sticky="nw")
         connected_sensor_identity_button.identifier = "indentify_btn"
         sensor_actions["identify_button"] = connected_sensor_identity_button
 
         connected_sensor_batt_label = CTkLabel(self.left_frame.sensor_frame, text=f"{sensor.batt_level}%", font=CTkFont(size=12, weight="bold"))
-        connected_sensor_batt_label.grid(row=self.connect_to_pos+2, column=2, padx=10, pady=10, sticky="nw")
+        connected_sensor_batt_label.grid(row=self.connect_to_pos+2, column=2, padx=5, pady=10, sticky="nw")
         connected_sensor_batt_label.identifier = "batt_status"
         sensor_actions['batt_label'] = connected_sensor_batt_label
 
-        disconnect_sensor_btn = CTkButton(self.left_frame.sensor_frame, text="disconnect", command= lambda: self.disconnect_from_sensor(sensor.address))
-        disconnect_sensor_btn.grid(row=self.connect_to_pos+2, column=3, padx=10, pady=10, sticky="nw")
+        disconnect_sensor_btn = CTkButton(self.left_frame.sensor_frame, text="disconnect",
+                                          width=100,
+                                          command= lambda: self.disconnect_from_sensor(sensor.address))
+        disconnect_sensor_btn.grid(row=self.connect_to_pos+2, column=4, padx=5, pady=10, sticky="nw")
         disconnect_sensor_btn.identifier = "disconnect_btn"
         sensor_actions['disconnect_button'] = disconnect_sensor_btn
 
         connected_sensor_data_rate_label = CTkLabel(self.left_frame.sensor_frame, text=f"60 Hz", font=CTkFont(size=12, weight="bold"))
-        connected_sensor_data_rate_label.grid(row=self.connect_to_pos+2, column=4, padx=10, pady=10, sticky="nw")
+        connected_sensor_data_rate_label.grid(row=self.connect_to_pos+2, column=3, padx=5, pady=10, sticky="nw")
         connected_sensor_data_rate_label.identifier = "data_rate"
         sensor_actions["data_rate_label"] = connected_sensor_data_rate_label
 
@@ -171,47 +172,28 @@ class MovellaDotSensorFrame(CTkFrame):
     # no need for this function
     def on_sensor_data(self, data_packet):
         pass
-        #print(data_packet.address, data_packet.data_packet)
-        #sensor = self.sm.manager.get_connected_sensor_by_address(data_packet.address)
-        #print(found_sensor)
-        #found_sensor.set_accleration([data_packet.data_packet[0][0], data_packet.data_packet[0][5], data_packet.data_packet[0][6], data_packet.data_packet[0][7] ])
 
     def update_stream_plot(self):
-
         thread = threading.Thread(target=self.clear_and_plot( self.right_frame.plot_frame.ax, self.right_frame.plot_frame.stream_fig_canvas, f"Loading",  self.sm.manager.get_connected_sensors()))
         thread.start()
         thread.join()
-        #self.ax, self.stream_fig_canvas, f"Acceleration {self.c.data_rate} Hz", "packet count", x, acc_x, acc_y, acc_z )
-        #threads = [threading.Thread(target=self.clear_and_plot, args=(self.right_frame.ax, self.right_frame.stream_fig_canvas,f"Acceleration", s), name=f"Thread-{s.address}") for s in self.connected_sensors]
-
-        #for thread in threads:
-        #    thread.start()
-
-        # Wait for all threads to finish
-        #for thread in threads:
-        #    thread.join()
-
-        self.update_stream_plot_task_id = self.after(1, self.update_stream_plot)
+        self.update_stream_plot_task_id = self.after(5000, self.update_stream_plot)
     
     def clear_and_plot(self, axis, canvas, title,  sensors_to_plot):
-       
+        colors = ["blue", "orange", "grey"]
         axis.clear()
         axis.set_title(title)
         axis.set_xlabel("5s Blocks")
-        #axis.xaxis.set_major_locator(MaxNLocator(integer=True))
-       # axis.text(0.005, 1.05, f"Data Rate: {self.rate} Hz ", transform=axis.transAxes)
         num_of_points = self.number_of_plot_points
-        num_of_points = 50
+        num_of_points = 10
         
         for idx, s in enumerate(sensors_to_plot):
-        #    print(s.get_packet_count())
-            #x = s.get_time_pc(num_of_points)
+            color = colors[idx]
             x = s.get_time_idx_in_window(num_of_points)
-            #accel_x = s.get_accel_x(num_of_points)
+            print("x axis", x)
+            time_index = [i+(idx/5) for i in x]
             li = s.get_li(num_of_points)
-
-            axis.bar(x , li, width=0.8, color="#5D5FEF")
-
+            axis.bar(time_index , li, width=0.2, color=color)
             sensor_actions = [sa for sa in self.connected_sensor_actions if sa["address"] == s.get_address()][0]
             sensor_actions["data_rate_label"].configure(text=f"{s.get_last_data_rate()} Hz")
         axis.autoscale_view()
@@ -279,8 +261,6 @@ class MovellaDotSensorFrame(CTkFrame):
 
                 #self.left_frame.protcol_frame.complete_protocol()
 
-        
-
     def start_measuring_for_sensors(self):
 
         #make sure there are connected sensors and there is a protcol
@@ -305,24 +285,12 @@ class MovellaDotSensorFrame(CTkFrame):
             if(self.sm.manager.get_number_of_connected_sensors()==0):
                 CTkMessagebox(title="Error", message="No sensors connected", icon="cancel")
             
-
-        
-
     def battery_status_callback(self, address, battery):
         print(f"ui batt status {address} {battery}%")
 
         if (len(self.connected_sensor_actions) == len(self.sm.manager.get_connected_sensors())):
            sensor_actions = [sa for sa in self.connected_sensor_actions if sa["address"] == address][0]
-           sensor_actions['batt_label'].configure(text=f"{battery}%")
-        #print(sensor_actions)
-        #self.
-        # to really use this we need to be able to track the rows / connected sensors to update the correct one
-        #if hasattr(self, 'connected_sensor_batt_label'):
-        #    sensor_actions['batt_label'].configure(text=f"{battery}%")
-            #if(battery <= 10):
-            #    self.connected_sensor_batt_label.configure(text=f"{battery}%", text_color="red")
-            #    self.console.insert_text(f"sensor {address} battery 10% or less" + '\n\n') 
-        #    self.console_frame.insert_text(f"sensor {address} will not send data" + '\n\n') 
+           sensor_actions['batt_label'].configure(text=f"{battery}%") 
 
     
     def identify_sensor(self, address):
@@ -335,9 +303,6 @@ class MovellaDotSensorFrame(CTkFrame):
         
         # need to remove all the buttons associated with connected and return to just connect
         pos = self.connected_sensor_positions[address]
-
-        #sensor_actions = [sa for sa in self.connected_sensor_actions if sa["address"] == address][0]
-        
         # position + 2 gets the row
         for widget in self.left_frame.sensor_frame.grid_slaves(row=pos+2):
            
@@ -369,7 +334,6 @@ class MovellaDotSensorFrame(CTkFrame):
 
         print(f"sensor {address} disconnected ")
 
-        
         sensor_action = [sa for sa in self.connected_sensor_actions if sa["address"] == address][0]
         self.connected_sensor_actions.remove(sensor_action)
         self.console.clear_console()
@@ -392,17 +356,19 @@ class MovellaDotSensorFrame(CTkFrame):
         self.console.clear_console()
 
         if(len(sensors)>0):
-            
             for idx, s in enumerate(sensors):
                 self.console.insert_text("Sensor found: " + s.address + " " +'\n')
                 label = CTkLabel(self.left_frame.sensor_frame, text=f"{s.address}")
                 labels.append(label)
-                connect_button = CTkButton(self.left_frame.sensor_frame, text="connect", fg_color="#EF5DA8", command=connect_lambda(s.address, idx))
+                connect_button = CTkButton(self.left_frame.sensor_frame, 
+                                           text="connect", fg_color="#EF5DA8", 
+                                           width=100,
+                                           command=connect_lambda(s.address, idx))
                 connect_buttons.append(connect_button) 
 
             for i in range(len(labels)):
-                labels[i].grid(row=i+2, column=0, padx=10,pady=10, sticky="w")
-                connect_buttons[i].grid(row=i+2, column=1, padx=10, pady=10, sticky="w")  
+                labels[i].grid(row=i+2, column=0, padx=5,pady=10, sticky="w")
+                connect_buttons[i].grid(row=i+2, column=1, padx=5, pady=10, sticky="w")  
         else:
             self.console.insert_text("No sensors found")
         

@@ -84,7 +84,6 @@ class SensorManager(SDK):
         return super().on_message_error(message_error)
     
     # sensor config access methods
-
     def get_connected_sensors(self):
         return self.connected_sensors
     
@@ -123,8 +122,6 @@ class SensorManager(SDK):
         for k in sc.sensor_types:
             supported_sensors.append(k)
         return supported_sensors
-    
-
 
     # class methods
     def add_scanned_sensors(self, s):
@@ -159,8 +156,6 @@ class SensorManager(SDK):
         while self.running:
             msg = await self.message_queue.get()
 
-            # load algorithm?
-
             #Scanning for sensors
             if msg["message"] == "scan":
                 scanned_sensors = await sf.discover_sensors(self)  
@@ -179,6 +174,8 @@ class SensorManager(SDK):
                 if(disconnected):
                     self.remove_single_connected_sensor(msg["address"])
                     self.on_sensor_disconnected(msg["address"])
+                else:
+                    print(f"failed to disconnect from sensor")
 
             # start measuring
             elif(msg["message"] == "start_measuring"):
